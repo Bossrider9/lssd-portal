@@ -4,23 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LSSD | Training Bureau Database</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
         :root {
             --primary: #c5a059;
-            --bg-dark: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --sidebar-width: 60px;
-            --sidebar-expanded: 260px;
+            --bg-dark: #0a0a0a;
+            --card-bg: #161616;
+            --sidebar-width: 70px;
+            --sidebar-expanded: 280px;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow-x: hidden; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow: hidden; }
 
         /* SIDEBAR */
         #sidebar {
             width: var(--sidebar-width);
             height: 100vh;
-            background: #0a140d;
-            border-right: 2px solid var(--primary);
+            background: #0d140f;
+            border-right: 1px solid #1b3022;
             position: fixed;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
@@ -28,87 +29,80 @@
             display: flex;
             flex-direction: column;
         }
-
         #sidebar:hover { width: var(--sidebar-expanded); }
 
         .nav-item {
-            padding: 15px 20px;
+            padding: 18px 23px;
             display: flex;
             align-items: center;
             cursor: pointer;
             white-space: nowrap;
-            color: #bbb;
+            color: #888;
             transition: 0.2s;
         }
-
         .nav-item:hover { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
-        .nav-item.active { background: rgba(197, 160, 89, 0.2); color: var(--primary); border-left: 4px solid var(--primary); }
-        .nav-icon { min-width: 25px; margin-right: 20px; font-size: 1.2em; text-align: center; }
+        .nav-item.active { background: rgba(197, 160, 89, 0.15); color: var(--primary); border-left: 4px solid var(--primary); }
+        .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
 
         /* MAIN CONTENT */
-        #main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; display: flex; flex-direction: column; overflow-y: auto; }
 
-        header { background: linear-gradient(135deg, #1b3022 0%, #0a140d 100%); border-bottom: 4px solid var(--primary); padding: 30px; text-align: center; }
-        header h1 { margin: 0; color: var(--primary); font-size: 1.8em; text-transform: uppercase; }
+        header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 25px; text-align: center; }
+        header h1 { margin: 0; color: var(--primary); font-size: 1.6em; text-transform: uppercase; letter-spacing: 2px; }
 
-        .search-container {
-            padding: 20px 30px;
-            background: #151515;
-            display: flex;
-            gap: 15px;
-        }
+        .search-bar-wrapper { padding: 20px 40px; background: #111; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px 25px; color: white; border-radius: 8px; font-size: 1em; outline: none; }
+        #search-input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(197,160,89,0.2); }
 
-        #search-input {
-            flex: 1;
-            background: #222;
-            border: 1px solid #333;
-            padding: 12px 20px;
-            color: white;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        #search-input:focus { outline: 1px solid var(--primary); border-color: var(--primary); }
-
-        .container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .container { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
 
         /* CARDS */
         .rank-card { 
             background: var(--card-bg); 
-            border-left: 6px solid var(--primary); 
+            border: 1px solid #222;
             padding: 20px; 
-            margin-bottom: 12px; 
+            margin-bottom: 15px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-radius: 5px;
+            border-radius: 10px;
+            cursor: pointer;
             transition: 0.2s;
         }
+        .rank-card:hover { border-color: var(--primary); background: #1d1d1d; }
 
-        .info-main { display: flex; flex-direction: column; }
-        .name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .name { font-size: 1.2em; font-weight: bold; color: white; }
-        .dob-label { font-size: 0.8em; color: #777; }
-        .badge-pill { background: var(--primary); color: #1b3022; padding: 2px 8px; font-weight: bold; border-radius: 3px; font-size: 0.8em; }
+        .profile-mini { display: flex; align-items: center; gap: 20px; }
+        .mini-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #333; }
+        .name-info b { display: block; font-size: 1.1em; color: white; }
+        .name-info span { font-size: 0.85em; color: #777; }
 
-        .certs-grid { display: flex; gap: 10px; }
-        .cert-box { 
-            background: rgba(255,255,255,0.03); 
-            padding: 8px 12px; 
-            border-radius: 4px; 
-            border: 1px solid rgba(197, 160, 89, 0.1);
-            text-align: center;
-            min-width: 90px;
+        /* PROFILE MODAL */
+        #profile-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center; align-items: center;
         }
-        .cert-label { display: block; font-size: 0.65em; color: var(--primary); text-transform: uppercase; margin-bottom: 3px; }
-        .cert-val { font-size: 0.9em; font-weight: 500; }
-        .status-passed { color: #4CAF50; font-weight: bold; }
+        .modal-content {
+            background: #161616;
+            width: 500px;
+            border-radius: 15px;
+            border: 1px solid var(--primary);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-header { height: 120px; background: linear-gradient(to right, #1b3022, #0d140f); }
+        .modal-body { padding: 30px; text-align: center; margin-top: -60px; }
+        .modal-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; background: #222; margin-bottom: 15px; }
+        .modal-name { font-size: 1.8em; color: white; margin: 10px 0; }
+        .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; }
+        .detail-item b { display: block; font-size: 0.7em; color: var(--primary); text-transform: uppercase; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #777; }
 
         .hidden { display: none !important; }
     </style>
@@ -116,26 +110,35 @@
 <body>
 
 <div id="sidebar">
-    <div style="padding: 20px; color: var(--primary); font-weight: bold; border-bottom: 1px solid #1b3022;">LSSD TB</div>
-    <div class="nav-item active" onclick="filterCategory('all', this)"><span class="nav-icon">📊</span><span>Všeobecný prehľad</span></div>
-    <div class="nav-item" onclick="filterCategory('evoc', this)"><span class="nav-icon">🚔</span><span>EVOC Certifikácie</span></div>
-    <div class="nav-item" onclick="filterCategory('weapons', this)"><span class="nav-icon">🔫</span><span>Zbraňové kvalifikácie</span></div>
-    <div class="nav-item" onclick="filterCategory('seb', this)"><span class="nav-icon">🦅</span><span>SEB Divízia</span></div>
-    <div class="nav-item" onclick="filterCategory('medical', this)"><span class="nav-icon">🚑</span><span>Medical / EMT</span></div>
+    <div style="padding: 25px 20px; color: var(--primary); font-weight: 800; font-size: 1.2em;">LSSD</div>
+    <div class="nav-item active" onclick="filterCategory('all', this)"><i class='bx bx-grid-alt nav-icon'></i><span>Dashboard</span></div>
+    <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC Operations</span></div>
+    <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Firearms Bureau</span></div>
+    <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield-quarter nav-icon'></i><span>SEB Tactical</span></div>
+    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical Services</span></div>
 </div>
 
 <div id="main-content">
     <header>
         <h1>Los Santos Sheriff Department</h1>
-        <p style="margin:5px 0 0; color:#777; letter-spacing:2px; font-size:0.9em;">Training Bureau Database</p>
+        <p style="color:#555; font-size:0.8em; margin:5px 0 0; letter-spacing:4px;">OFFICIAL TRAINING DATABASE</p>
     </header>
 
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="Vyhľadať podľa mena, BN (#101) alebo DOB (01/01/1990)..." onkeyup="handleSearch()">
+    <div class="search-bar-wrapper">
+        <input type="text" id="search-input" placeholder="Search by Name, Badge #, DOB or Phone..." onkeyup="handleSearch()">
     </div>
 
     <div class="container" id="roster-container">
-        <div style="text-align: center; margin-top: 50px; color: var(--primary);">Pripájanie k šifrovanej databáze...</div>
+        <div style="text-align: center; margin-top: 50px; color: #444;">Accessing LSSD Data Nodes...</div>
+    </div>
+</div>
+
+<div id="profile-modal" onclick="closeProfile(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span>
+        <div class="modal-header"></div>
+        <div class="modal-body" id="modal-data">
+            </div>
     </div>
 </div>
 
@@ -145,7 +148,7 @@
     let currentData = [];
     let currentFilter = 'all';
 
-    async function loadRoster() {
+    async function loadData() {
         try {
             const response = await fetch(realCsvUrl);
             const csv = await response.text();
@@ -154,83 +157,74 @@
             currentData = rows.map(row => {
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
                 return {
-                    meno: cols[0] || "",
-                    badge: cols[1] || "",
-                    hodnost: cols[2] || "",
-                    evoc: cols[3] || "",
-                    zbrane: cols[4] || "",
-                    seb: cols[5] || "",
-                    medical: cols[6] || "",
-                    dob: cols[7] || ""
+                    meno: cols[0], badge: cols[1], hodnost: cols[2], 
+                    evoc: cols[3], zbrane: cols[4], seb: cols[5], 
+                    medical: cols[6], dob: cols[7], foto: cols[8], tel: cols[9]
                 };
-            }).filter(d => d.meno !== "");
-
+            }).filter(d => d.meno);
             renderRoster(currentData);
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderRoster(data) {
         const container = document.getElementById('roster-container');
         container.innerHTML = "";
-
-        data.forEach(p => {
+        data.forEach((p, index) => {
             const card = document.createElement('div');
             card.className = 'rank-card';
-            card.setAttribute('data-name', p.meno.toLowerCase());
-            card.setAttribute('data-badge', p.badge.toLowerCase());
-            card.setAttribute('data-dob', p.dob.toLowerCase());
-
-            let certsHtml = "";
-            if (currentFilter === 'all') {
-                certsHtml = `
-                    <div class="cert-box"><span class="cert-label">EVOC</span><span class="cert-val ${p.evoc ? 'status-passed' : ''}">${p.evoc || 'N/A'}</span></div>
-                    <div class="cert-box"><span class="cert-label">Weapons</span><span class="cert-val ${p.zbrane ? 'status-passed' : ''}">${p.zbrane || 'N/A'}</span></div>
-                    <div class="cert-box"><span class="cert-label">SEB</span><span class="cert-val ${p.seb ? 'status-passed' : ''}">${p.seb || 'N/A'}</span></div>
-                `;
-            } else {
-                const val = p[currentFilter];
-                certsHtml = `<div class="cert-box" style="min-width:200px;"><span class="cert-label">${currentFilter.toUpperCase()} STATUS</span><span class="cert-val ${val ? 'status-passed' : ''}">${val || 'NOT QUALIFIED'}</span></div>`;
-            }
+            card.onclick = () => openProfile(p);
+            card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.dob} ${p.tel}`.toLowerCase());
 
             card.innerHTML = `
-                <div class="info-main">
-                    <div class="name-row">
-                        <span class="badge-pill">${p.hodnost}</span>
-                        <span class="name">${p.meno}</span>
-                        <span style="color:var(--primary)">#${p.badge}</span>
+                <div class="profile-mini">
+                    <img src="${p.foto || 'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
+                    <div class="name-info">
+                        <b>${p.meno}</b>
+                        <span>${p.hodnost} • #${p.badge}</span>
                     </div>
-                    <div class="dob-label">DOB: ${p.dob || 'Unknown'}</div>
                 </div>
-                <div class="certs-grid">${certsHtml}</div>
+                <div style="color: var(--primary); font-weight: bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>
             `;
             container.appendChild(card);
         });
     }
 
+    function openProfile(p) {
+        const modal = document.getElementById('profile-modal');
+        const body = document.getElementById('modal-data');
+        body.innerHTML = `
+            <img src="${p.foto || 'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
+            <div class="modal-name">${p.meno}</div>
+            <div style="color:var(--primary); font-weight:bold;">${p.hodnost} #${p.badge}</div>
+            
+            <div class="modal-details">
+                <div class="detail-item"><b>Date of Birth</b>${p.dob || 'Unknown'}</div>
+                <div class="detail-item"><b>Phone Number</b>${p.tel || 'N/A'}</div>
+                <div class="detail-item"><b>EVOC Status</b>${p.evoc || 'Not Qualified'}</div>
+                <div class="detail-item"><b>Firearms</b>${p.zbrane || 'Not Qualified'}</div>
+                <div class="detail-item"><b>Tactical (SEB)</b>${p.seb || 'Not Qualified'}</div>
+                <div class="detail-item"><b>Medical</b>${p.medical || 'Not Qualified'}</div>
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+
     function handleSearch() {
         const query = document.getElementById('search-input').value.toLowerCase();
         const cards = document.getElementsByClassName('rank-card');
-
         Array.from(cards).forEach(card => {
-            const match = card.getAttribute('data-name').includes(query) || 
-                          card.getAttribute('data-badge').includes(query) || 
-                          card.getAttribute('data-dob').includes(query);
-            card.classList.toggle('hidden', !match);
+            card.classList.toggle('hidden', !card.getAttribute('data-search').includes(query));
         });
     }
 
     function filterCategory(cat, el) {
-        currentFilter = cat;
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
-        renderRoster(currentData);
-        handleSearch();
+        // Pre jednoduchosť dashboardu teraz len filtrujeme zobrazenie
+        loadData(); // Re-load pre istotu
     }
 
-    loadRoster();
+    loadData();
 </script>
-
 </body>
 </html>
