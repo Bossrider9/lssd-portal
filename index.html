@@ -3,89 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSSD | Training Bureau Portal</title>
+    <title>LSSD | Training Bureau Database</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 0; }
-        header { background: linear-gradient(135deg, #1b3022 0%, #0d1a12 100%); border-bottom: 3px solid #c5a059; padding: 40px 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0,5); }
-        header h1 { margin: 0; color: #c5a059; letter-spacing: 2px; font-size: 2.5em; text-transform: uppercase; }
-        header p { margin: 10px 0 0; font-style: italic; color: #a0a0a0; }
-        .container { padding: 30px; max-width: 1000px; margin: auto; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f0f; color: #e0e0e0; margin: 0; padding: 0; }
+        header { background: linear-gradient(135deg, #1b3022 0%, #0a140d 100%); border-bottom: 4px solid #c5a059; padding: 45px 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.7); }
+        header h1 { margin: 0; color: #c5a059; letter-spacing: 1px; font-size: 2.2em; text-transform: uppercase; font-weight: 800; }
+        header p { margin: 12px 0 0; font-size: 1.1em; color: #d1d1d1; text-transform: uppercase; letter-spacing: 3px; font-weight: 300; }
+        .container { padding: 30px; max-width: 1050px; margin: auto; }
         .loading { text-align: center; font-size: 1.2em; color: #c5a059; margin-top: 50px; }
-        .rank-card { background: #1e1e1e; border-left: 5px solid #c5a059; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; transition: transform 0.2s; }
-        .rank-card:hover { transform: scale(1.01); background: #252525; }
-        .badge { background: #c5a059; color: #1b3022; padding: 4px 12px; font-weight: bold; border-radius: 3px; margin-right: 15px; font-size: 0.9em; }
+        .rank-card { background: #1a1a1a; border-left: 6px solid #c5a059; padding: 22px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease; }
+        .rank-card:hover { transform: translateY(-2px); background: #222222; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
+        .badge { background: #c5a059; color: #1b3022; padding: 5px 14px; font-weight: 900; border-radius: 3px; margin-right: 18px; font-size: 0.85em; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
         .info-main { display: flex; align-items: center; }
-        .name { font-size: 1.2em; font-weight: bold; }
-        .certs { display: flex; gap: 15px; font-size: 0.85em; color: #bbb; }
-        .cert-item b { color: #c5a059; }
-        .status-passed { color: #4CAF50; font-weight: bold; }
-        footer { text-align: center; padding: 20px; color: #555; font-size: 0.8em; margin-top: 50px; border-top: 1px solid #222; }
+        .name { font-size: 1.3em; font-weight: 600; color: #ffffff; }
+        .certs { display: flex; gap: 20px; font-size: 0.9em; color: #cccccc; }
+        .cert-item { background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(197, 160, 89, 0.2); }
+        .cert-item b { color: #c5a059; margin-right: 5px; }
+        .status-passed { color: #4CAF50; font-weight: bold; text-shadow: 0 0 5px rgba(76, 175, 80, 0.3); }
+        h2 { border-bottom: 1px solid #333; padding-bottom: 10px; color: #c5a059; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
+        footer { text-align: center; padding: 30px; color: #444; font-size: 0.8em; margin-top: 60px; border-top: 1px solid #222; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>L.A.S.D. PORTAL</h1>
-    <p>Training Bureau & Personnel Management System</p>
+    <h1>Los Santos Sheriff Department</h1>
+    <p>Training Bureau Database</p>
 </header>
 
 <div class="container" id="roster-container">
-    <div class="loading">Načítavam databázu zástupcov...</div>
+    <div class="loading">Inicilizujem prístup k databáze...</div>
 </div>
 
 <footer>
-    Authorized Personnel Only. Unauthorized access is a violation of CA Penal Code 502.<br>
-    &copy; 2026 Los Angeles County Sheriff's Department - FiveM Division
+    OFFICIAL GOVERNMENT DATABASE - LSSD AUTHORIZED ACCESS ONLY<br>
+    UNAUTHORIZED ATTEMPT TO ACCESS PROTECTED DATA IS A FELONY UNDER CALIFORNIA PENAL CODE 502<br>
+    &copy; 2026 Los Santos County Sheriff's Department
 </footer>
 
 <script>
-    // Tvoja linka na tabuľku v CSV formáte
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6_T6P0Xp9Z5xH1X9Xp9Z5xH1X9Xp9Z5xH1X9Xp9Z5xH1X9Xp9Z5xH1X9Xp9Z5xH1X9Xp9Z5xH1X9/pub?output=csv";
-    
-    // Keďže horný link je špeciálny pre publikovanie, použijeme tvoje ID tabuľky:
+    // ID tvojej tabuľky zostáva rovnaké
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
-    const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
-
-    async function loadRoster() {
-        try {
-            const response = await fetch(realCsvUrl);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1); // Odstráni hlavičku
-            
-            const container = document.getElementById('roster-container');
-            container.innerHTML = '<h2>Personnel Roster</h2>';
-
-            rows.forEach(row => {
-                // Rozdelenie CSV riadku (ošetrenie úvodzoviek)
-                const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/"/g, ''));
-                
-                if (columns.length >= 3) {
-                    const [meno, badge, hodnost, evoc, zbrane, seb] = columns;
-
-                    const card = document.createElement('div');
-                    card.className = 'rank-card';
-                    card.innerHTML = `
-                        <div class="info-main">
-                            <span class="badge">${hodnost || 'DEP'}</span>
-                            <div class="name">${meno} <span style="color: #777; font-weight: normal; font-size: 0.8em;">#${badge}</span></div>
-                        </div>
-                        <div class="certs">
-                            <div class="cert-item">EVOC: <span class="${evoc ? 'status-passed' : ''}">${evoc || 'N/A'}</span></div>
-                            <div class="cert-item">WEAPONS: <span class="${zbrane ? 'status-passed' : ''}">${zbrane || 'N/A'}</span></div>
-                            <div class="cert-item">SEB: <span class="${seb ? 'status-passed' : ''}">${seb || 'N/A'}</span></div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-            });
-        } catch (error) {
-            document.getElementById('roster-container').innerHTML = '<div style="color:red">Chyba pri načítaní dát. Skontroluj zdieľanie tabuľky.</div>';
-            console.error(error);
-        }
-    }
-
-    loadRoster();
-</script>
-
-</body>
-</html>
