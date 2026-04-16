@@ -75,6 +75,7 @@
         .mini-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #333; }
         .name-info b { display: block; font-size: 1.1em; color: white; }
         .name-info span { font-size: 0.85em; color: #777; }
+        .status-passed { color: #4CAF50; font-weight: bold; }
 
         /* PROFILE MODAL */
         #profile-modal {
@@ -105,6 +106,16 @@
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #777; }
 
         .hidden { display: none !important; }
+
+        /* STATUS BOX STYLE FROM SCREENSHOT */
+        .status-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            min-width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -143,8 +154,10 @@
 </div>
 
 <script>
-    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
+    // TU VLOŽ SVOJE NOVÉ ID TABUĽKY
+    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w'; 
     const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
+    
     let currentData = [];
     let currentFilter = 'all';
 
@@ -163,17 +176,35 @@
                 };
             }).filter(d => d.meno);
             renderRoster(currentData);
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('roster-container').innerHTML = '<div style="text-align:center;color:red;">CHYBA: Nepodarilo sa načítať dáta. Skontroluj ID tabuľky a zdieľanie.</div>';
+        }
     }
 
     function renderRoster(data) {
         const container = document.getElementById('roster-container');
         container.innerHTML = "";
-        data.forEach((p, index) => {
+        
+        data.forEach((p) => {
             const card = document.createElement('div');
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
             card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.dob} ${p.tel}`.toLowerCase());
+
+            let rightSideHtml = "";
+            if (currentFilter === 'all') {
+                rightSideHtml = `<div style="color: var(--primary); font-weight: bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>`;
+            } else {
+                const val = p[currentFilter] || 'NOT QUALIFIED';
+                const isPassed = val.toLowerCase() !== 'not qualified' && val.toLowerCase() !== 'n/a';
+                rightSideHtml = `
+                    <div class="status-box">
+                        <span style="display:block; font-size:0.65em; color:#777; text-transform:uppercase;">${currentFilter.toUpperCase()} STATUS</span>
+                        <span class="${isPassed ? 'status-passed' : ''}" style="font-size:0.9em;">${val}</span>
+                    </div>
+                `;
+            }
 
             card.innerHTML = `
                 <div class="profile-mini">
@@ -181,9 +212,10 @@
                     <div class="name-info">
                         <b>${p.meno}</b>
                         <span>${p.hodnost} • #${p.badge}</span>
+                        <div style="font-size: 0.75em; color: #555; margin-top: 4px;">DOB: ${p.dob || 'Unknown'}</div>
                     </div>
                 </div>
-                <div style="color: var(--primary); font-weight: bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>
+                ${rightSideHtml}
             `;
             container.appendChild(card);
         });
@@ -218,13 +250,15 @@
     }
 
     function filterCategory(cat, el) {
+        currentFilter = cat;
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
-        // Pre jednoduchosť dashboardu teraz len filtrujeme zobrazenie
-        loadData(); // Re-load pre istotu
+        renderRoster(currentData);
+        handleSearch();
     }
 
     loadData();
 </script>
+
 </body>
 </html>
