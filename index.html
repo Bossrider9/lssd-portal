@@ -9,16 +9,17 @@
         header { background: linear-gradient(135deg, #1b3022 0%, #0a140d 100%); border-bottom: 4px solid #c5a059; padding: 45px 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.7); }
         header h1 { margin: 0; color: #c5a059; letter-spacing: 1px; font-size: 2.2em; text-transform: uppercase; font-weight: 800; }
         header p { margin: 12px 0 0; font-size: 1.1em; color: #d1d1d1; text-transform: uppercase; letter-spacing: 3px; font-weight: 300; }
-        .container { padding: 30px; max-width: 1050px; margin: auto; }
+        .container { padding: 30px; max-width: 1100px; margin: auto; }
         .loading { text-align: center; font-size: 1.2em; color: #c5a059; margin-top: 50px; }
         .rank-card { background: #1a1a1a; border-left: 6px solid #c5a059; padding: 22px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease; }
         .rank-card:hover { transform: translateY(-2px); background: #222222; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
-        .badge { background: #c5a059; color: #1b3022; padding: 5px 14px; font-weight: 900; border-radius: 3px; margin-right: 18px; font-size: 0.85em; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+        .badge-pill { background: #c5a059; color: #1b3022; padding: 5px 14px; font-weight: 900; border-radius: 3px; margin-right: 18px; font-size: 0.85em; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); min-width: 40px; text-align: center; }
         .info-main { display: flex; align-items: center; }
         .name { font-size: 1.3em; font-weight: 600; color: #ffffff; }
-        .certs { display: flex; gap: 20px; font-size: 0.9em; color: #cccccc; }
-        .cert-item { background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(197, 160, 89, 0.2); }
-        .cert-item b { color: #c5a059; margin-right: 5px; }
+        .badge-number { color: #c5a059; font-weight: 400; font-size: 0.9em; margin-left: 8px; }
+        .certs { display: flex; gap: 15px; font-size: 0.85em; color: #cccccc; flex-wrap: wrap; }
+        .cert-item { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(197, 160, 89, 0.2); min-width: 100px; }
+        .cert-item b { color: #c5a059; margin-right: 5px; display: block; font-size: 0.75em; text-transform: uppercase; margin-bottom: 2px; }
         .status-passed { color: #4CAF50; font-weight: bold; text-shadow: 0 0 5px rgba(76, 175, 80, 0.3); }
         h2 { border-bottom: 1px solid #333; padding-bottom: 10px; color: #c5a059; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
         footer { text-align: center; padding: 30px; color: #444; font-size: 0.8em; margin-top: 60px; border-top: 1px solid #222; line-height: 1.6; }
@@ -32,7 +33,7 @@
 </header>
 
 <div class="container" id="roster-container">
-    <div class="loading">Inicilizujem prístup k databáze...</div>
+    <div class="loading">Inicilizujem prístup k zabezpečenej databáze...</div>
 </div>
 
 <footer>
@@ -42,5 +43,50 @@
 </footer>
 
 <script>
-    // ID tvojej tabuľky zostáva rovnaké
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
+    const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
+
+    async function loadRoster() {
+        try {
+            const response = await fetch(realCsvUrl);
+            const data = await response.text();
+            const rows = data.split('\n').slice(1); 
+            
+            const container = document.getElementById('roster-container');
+            container.innerHTML = '<h2>Personnel Training Records</h2>';
+
+            rows.forEach(row => {
+                const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/"/g, '').trim());
+                
+                if (columns.length >= 3 && columns[0] !== "") {
+                    // Meno, Badge, Hodnost, EVOC, Zbrane, SEB, Medical
+                    const [meno, badge, hodnost, evoc, zbrane, seb, medical] = columns;
+
+                    const card = document.createElement('div');
+                    card.className = 'rank-card';
+                    card.innerHTML = `
+                        <div class="info-main">
+                            <span class="badge-pill">${hodnost || 'DEP'}</span>
+                            <div class="name">${meno} <span class="badge-number">#${badge}</span></div>
+                        </div>
+                        <div class="certs">
+                            <div class="cert-item"><b>EVOC</b> <span class="${evoc ? 'status-passed' : ''}">${evoc || 'N/A'}</span></div>
+                            <div class="cert-item"><b>Weapons</b> <span class="${zbrane ? 'status-passed' : ''}">${zbrane || 'N/A'}</span></div>
+                            <div class="cert-item"><b>SEB</b> <span class="${seb ? 'status-passed' : ''}">${seb || 'N/A'}</span></div>
+                            <div class="cert-item"><b>Medical</b> <span class="${medical ? 'status-passed' : ''}">${medical || 'N/A'}</span></div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        } catch (error) {
+            document.getElementById('roster-container').innerHTML = '<div style="color:#ff4444; text-align:center;">DATABASE ERROR: ACCESS DENIED</div>';
+            console.error(error);
+        }
+    }
+
+    loadRoster();
+</script>
+
+</body>
+</html>
