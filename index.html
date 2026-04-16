@@ -3,157 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSSD | Training Bureau Database</title>
+    <title>LSSD | Training Bureau</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        :root {
-            --primary: #c5a059;
-            --bg-dark: #0a0a0a;
-            --card-bg: #161616;
-            --sidebar-width: 70px;
-            --sidebar-expanded: 280px;
-        }
-
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow: hidden; }
-
-        /* SIDEBAR */
-        #sidebar {
-            width: var(--sidebar-width); height: 100vh; background: #0d140f; border-right: 1px solid #1b3022;
-            position: fixed; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column;
-        }
+        :root { --primary: #c5a059; --bg-dark: #0a0a0a; --card-bg: #161616; --sidebar-width: 70px; --sidebar-expanded: 280px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow: hidden; }
+        #sidebar { width: var(--sidebar-width); height: 100vh; background: #0d140f; border-right: 1px solid #1b3022; position: fixed; transition: 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
         #sidebar:hover { width: var(--sidebar-expanded); }
-        .nav-item { padding: 18px 23px; display: flex; align-items: center; cursor: pointer; white-space: nowrap; color: #888; transition: 0.2s; }
-        .nav-item:hover { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
-        .nav-item.active { background: rgba(197, 160, 89, 0.15); color: var(--primary); border-left: 4px solid var(--primary); }
+        .nav-item { padding: 18px 23px; display: flex; align-items: center; cursor: pointer; color: #888; white-space: nowrap; }
+        .nav-item:hover, .nav-item.active { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
         .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
-
-        /* MAIN CONTENT */
-        #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; display: flex; flex-direction: column; overflow-y: auto; }
+        #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
         header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 25px; text-align: center; }
-        header h1 { margin: 0; color: var(--primary); font-size: 1.6em; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* ADMIN BANNER & FORM */
-        #admin-banner { display: none; background: #c5a059; color: black; padding: 15px; text-align: center; font-weight: bold; border-bottom: 2px solid #000; }
-        .admin-btn { background: black; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; font-weight: bold; }
-        #add-member-form { 
-            display: none; background: #1a1a1a; color: white; padding: 25px; max-width: 600px; margin: 20px auto; 
-            border-radius: 10px; border: 1px solid var(--primary); text-align: left; 
-        }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-grid input { background: #222; border: 1px solid #444; padding: 10px; color: white; border-radius: 5px; width: 100%; box-sizing: border-box; }
-
-        .search-bar-wrapper { padding: 20px 40px; background: #111; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px 25px; color: white; border-radius: 8px; outline: none; }
-
-        .container { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-
-        /* CARDS */
-        .rank-card { 
-            background: var(--card-bg); border: 1px solid #222; padding: 20px; margin-bottom: 15px; 
-            display: flex; justify-content: space-between; align-items: center; border-radius: 10px; cursor: pointer; transition: 0.2s;
-        }
-        .rank-card:hover { border-color: var(--primary); background: #1d1d1d; }
-        .profile-mini { display: flex; align-items: center; gap: 20px; }
-        .mini-photo { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #333; }
-        .name-info b { display: block; font-size: 1.1em; color: white; }
-        .name-info span { font-size: 0.85em; color: #777; }
-        .status-box { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px 20px; border-radius: 5px; text-align: center; min-width: 160px; }
+        header h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        #admin-banner { display: none; background: var(--primary); color: black; padding: 10px; text-align: center; font-weight: bold; }
+        .admin-btn { background: black; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        #add-member-form { display: none; background: #1a1a1a; padding: 20px; border-bottom: 1px solid var(--primary); }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 900px; margin: 0 auto; }
+        .form-grid input { background: #222; border: 1px solid #444; padding: 8px; color: white; border-radius: 4px; }
+        .search-bar-wrapper { padding: 20px 40px; background: #111; position: sticky; top: 0; z-index: 100; }
+        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px; color: white; border-radius: 8px; outline: none; }
+        .container { padding: 20px 40px; }
+        .rank-card { background: var(--card-bg); border: 1px solid #222; padding: 15px 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; cursor: pointer; }
+        .rank-card:hover { border-color: var(--primary); }
+        .profile-mini { display: flex; align-items: center; gap: 15px; }
+        .mini-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        .status-box { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 8px 15px; border-radius: 5px; text-align: center; min-width: 140px; }
         .status-passed { color: #4CAF50; font-weight: bold; }
-
-        /* MODAL */
         #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #161616; width: 500px; border-radius: 15px; border: 1px solid var(--primary); overflow: hidden; position: relative; }
-        .modal-header { height: 100px; background: linear-gradient(to right, #1b3022, #0d140f); }
-        .modal-body { padding: 30px; text-align: center; margin-top: -60px; }
-        .modal-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; background: #222; margin-bottom: 15px; }
-        .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; }
+        .modal-content { background: #161616; width: 500px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; }
+        .modal-header { height: 80px; background: #1b3022; }
+        .modal-body { padding: 0 30px; text-align: center; margin-top: -50px; }
+        .modal-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; background: #222; }
+        .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
         .detail-item b { display: block; font-size: 0.7em; color: var(--primary); text-transform: uppercase; }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #777; }
+        .admin-select { width: 100%; background: #222; color: white; border: 1px solid var(--primary); padding: 5px; margin-top: 5px; }
+        .update-btn { background: var(--primary); color: black; border: none; padding: 10px; width: 80%; margin-top: 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <div style="padding: 25px 20px; color: var(--primary); font-weight: 800; font-size: 1.2em;">LSSD</div>
-    <div class="nav-item active" onclick="filterCategory('all', this)"><i class='bx bx-grid-alt nav-icon'></i><span>Dashboard</span></div>
-    <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC Operations</span></div>
-    <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Firearms Bureau</span></div>
-    <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield-quarter nav-icon'></i><span>SEB Tactical</span></div>
-    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical Services</span></div>
-    
-    <div style="margin-top: auto; border-top: 1px solid #1b3022;">
-        <div class="nav-item" onclick="loginAdmin()"><i class='bx bx-lock-alt nav-icon' id="admin-icon"></i><span id="admin-text">Admin Login</span></div>
-    </div>
+    <div style="padding: 20px; color: var(--primary); font-weight: bold;">LSSD TB</div>
+    <div class="nav-item active" onclick="filterCategory('all', this)"><i class='bx bx-grid-alt nav-icon'></i><span>Prehľad</span></div>
+    <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC</span></div>
+    <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Zbrane</span></div>
+    <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield nav-icon'></i><span>SEB</span></div>
+    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical</span></div>
+    <div style="margin-top: auto; border-top: 1px solid #1b3022;"><div class="nav-item" onclick="loginAdmin()"><i class='bx bx-lock-alt nav-icon' id="admin-icon"></i><span id="admin-text">Admin Login</span></div></div>
 </div>
 
 <div id="main-content">
-    <header>
-        <h1>Los Santos Sheriff Department</h1>
-        <p style="color:#555; font-size:0.8em; margin:5px 0 0; letter-spacing:4px;">OFFICIAL TRAINING DATABASE</p>
-    </header>
-
-    <div id="admin-banner">
-        ADMIN MODE ACTIVE | 
-        <button class="admin-btn" onclick="toggleForm()">+ PRIDAŤ NOVÉHO ČLENA</button>
-        <button class="admin-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/'+SPREADSHEET_ID+'/edit', '_blank')">UPRAVIŤ TABUĽKU</button>
-    </div>
-
+    <header><h1>Los Santos Sheriff Department</h1></header>
+    <div id="admin-banner">ADMIN PANEL AKTÍVNY | <button class="admin-btn" onclick="toggleForm()">+ PRIDAŤ ČLENA</button></div>
     <div id="add-member-form">
-        <h3 style="margin-top:0; color:var(--primary);">Registrácia nového člena</h3>
         <div class="form-grid">
-            <input type="text" id="new-meno" placeholder="Meno a Priezvisko">
+            <input type="text" id="new-meno" placeholder="Meno">
             <input type="text" id="new-badge" placeholder="Badge #">
             <input type="text" id="new-hodnost" placeholder="Hodnosť">
-            <input type="text" id="new-dob" placeholder="Dátum narodenia">
-            <input type="text" id="new-tel" placeholder="Telefónne číslo">
-            <input type="text" id="new-foto" placeholder="Link na foto (nepovinné)">
+            <input type="text" id="new-dob" placeholder="DOB">
+            <input type="text" id="new-tel" placeholder="Telefón">
+            <input type="text" id="new-foto" placeholder="Link na foto">
         </div>
-        <button id="submit-btn" onclick="submitNewMember()" style="background:var(--primary); border:none; padding:10px 20px; font-weight:bold; cursor:pointer;">ULOŽIŤ DO SYSTÉMU</button>
-        <button onclick="toggleForm()" style="background:#444; color:white; border:none; padding:10px 20px; margin-left:10px; cursor:pointer;">ZRUŠIŤ</button>
+        <button onclick="submitMember('create')" style="display:block; margin: 10px auto; background: var(--primary); border:none; padding: 8px 20px; cursor:pointer; font-weight:bold;">ULOŽIŤ</button>
     </div>
-
-    <div class="search-bar-wrapper">
-        <input type="text" id="search-input" placeholder="Search by Name, Badge #, DOB..." onkeyup="handleSearch()">
-    </div>
-
-    <div class="container" id="roster-container">
-        <div style="text-align: center; margin-top: 50px; color: #444;">Accessing LSSD Data Nodes...</div>
-    </div>
+    <div class="search-bar-wrapper"><input type="text" id="search-input" placeholder="Hľadať..." onkeyup="handleSearch()"></div>
+    <div class="container" id="roster-container">Načítavam dáta...</div>
 </div>
 
-<div id="profile-modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span>
-        <div class="modal-header"></div>
-        <div class="modal-body" id="modal-data"></div>
-    </div>
-</div>
+<div id="profile-modal"><div class="modal-content"><span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span><div class="modal-header"></div><div class="modal-body" id="modal-data"></div></div></div>
 
 <script>
-    // --- KONFIGURÁCIA (NASTAVENÉ) ---
-    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec'; 
-    const ADMIN_PASSWORD = "LSSD2026"; 
-    // ------------------------------------------
+    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
+    const ADMIN_PASSWORD = "LSSD2026";
 
-    const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
-    let currentData = [];
-    let currentFilter = 'all';
-    let isAdmin = false;
+    let currentData = [], currentFilter = 'all', isAdmin = false;
 
     async function loadData() {
         try {
-            const response = await fetch(realCsvUrl);
-            const csv = await response.text();
-            const rows = csv.split('\n').slice(1);
-            currentData = rows.map(row => {
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
-                return {
-                    meno: cols[0], badge: cols[1], hodnost: cols[2], evoc: cols[3], 
-                    zbrane: cols[4], seb: cols[5], medical: cols[6], dob: cols[7], foto: cols[8], tel: cols[9]
-                };
-            }).filter(d => d.meno);
+            const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`);
+            const csv = await res.text();
+            currentData = csv.split('\n').slice(1).map(row => {
+                const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
+                return { meno:c[0], badge:c[1], hodnost:c[2], evoc:c[3], zbrane:c[4], seb:c[5], medical:c[6], dob:c[7], foto:c[8], tel:c[9] };
+            }).filter(x => x.meno);
             renderRoster(currentData);
         } catch (e) { console.error(e); }
     }
@@ -165,48 +101,57 @@
             const card = document.createElement('div');
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
-            card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.dob}`.toLowerCase());
-
-            let rightHtml = "";
-            if (currentFilter === 'all') {
-                rightHtml = `<div style="color:var(--primary); font-weight:bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>`;
-            } else {
-                const val = p[currentFilter] || 'N/A';
-                const passed = val.toLowerCase() !== 'n/a' && val !== "";
-                rightHtml = `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${passed?'status-passed':''}">${val}</span></div>`;
-            }
-
-            card.innerHTML = `
-                <div class="profile-mini">
-                    <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
-                    <div class="name-info"><b>${p.meno}</b><span>${p.hodnost} • #${p.badge}</span></div>
-                </div>${rightHtml}`;
+            card.setAttribute('data-search', `${p.meno} ${p.badge}`.toLowerCase());
+            let right = currentFilter === 'all' ? `<div style="color:var(--primary)">PROFIL ></div>` : `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${(p[currentFilter]||'N/A')!=='N/A'?'status-passed':''}">${p[currentFilter]||'N/A'}</span></div>`;
+            card.innerHTML = `<div class="profile-mini"><img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo"><div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div></div>${right}`;
             container.appendChild(card);
         });
     }
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
+        const options = {
+            evoc: ["N/A", "Class A", "Class B", "Class C"],
+            zbrane: ["N/A", "Certified", "Expert", "Instructor"],
+            seb: ["N/A", "Active", "Reserve", "Specialist"],
+            medical: ["N/A", "EMT-B", "EMT-P", "Medical Dir."]
+        };
+
+        const createSelect = (cat, current) => isAdmin ? `<select id="edit-${cat}" class="admin-select">${options[cat].map(o => `<option value="${o}" ${o===current?'selected':''}>${o}</option>`).join('')}</select>` : `<span>${current||'N/A'}</span>`;
+
         document.getElementById('modal-data').innerHTML = `
-            <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
-            <div style="font-size:1.8em; color:white;">${p.meno}</div>
-            <div style="color:var(--primary); font-weight:bold; margin-bottom:20px;">${p.hodnost} #${p.badge}</div>
+            <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo">
+            <h2 style="margin:10px 0 5px;">${p.meno}</h2>
+            <div style="color:var(--primary); font-weight:bold;">${p.hodnost} #${p.badge}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>DOB</b>${p.dob||'Unknown'}</div>
-                <div class="detail-item"><b>Phone</b>${p.tel||'N/A'}</div>
-                <div class="detail-item"><b>EVOC</b>${p.evoc||'N/A'}</div>
-                <div class="detail-item"><b>Firearms</b>${p.zbrane||'N/A'}</div>
-                <div class="detail-item"><b>SEB</b>${p.seb||'N/A'}</div>
-                <div class="detail-item"><b>Medical</b>${p.medical||'N/A'}</div>
-            </div>`;
+                <div class="detail-item"><b>EVOC</b>${createSelect('evoc', p.evoc)}</div>
+                <div class="detail-item"><b>Zbrane</b>${createSelect('zbrane', p.zbrane)}</div>
+                <div class="detail-item"><b>SEB Divízia</b>${createSelect('seb', p.seb)}</div>
+                <div class="detail-item"><b>Medical</b>${createSelect('medical', p.medical)}</div>
+                <div class="detail-item"><b>DOB</b><span>${p.dob||'N/A'}</span></div>
+                <div class="detail-item"><b>Telefón</b><span>${p.tel||'N/A'}</span></div>
+            </div>
+            ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.badge}')">AKTUALIZOVAŤ PROFIL</button>` : ''}
+        `;
         modal.style.display = 'flex';
     }
 
-    function handleSearch() {
-        const q = document.getElementById('search-input').value.toLowerCase();
-        Array.from(document.getElementsByClassName('rank-card')).forEach(c => {
-            c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q));
-        });
+    async function updateExisting(badge) {
+        const d = { action: "update", badge, evoc: document.getElementById('edit-evoc').value, zbrane: document.getElementById('edit-zbrane').value, seb: document.getElementById('edit-seb').value, medical: document.getElementById('edit-medical').value };
+        const btn = event.target; btn.innerText = "UKLADÁM..."; btn.disabled = true;
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+        alert("Zmeny uložené!"); location.reload();
+    }
+
+    async function submitMember(action) {
+        const d = { action, meno: document.getElementById('new-meno').value, badge: document.getElementById('new-badge').value, hodnost: document.getElementById('new-hodnost').value, dob: document.getElementById('new-dob').value, tel: document.getElementById('new-tel').value, foto: document.getElementById('new-foto').value };
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+        alert("Člen pridaný!"); location.reload();
+    }
+
+    function loginAdmin() {
+        if(isAdmin) { location.reload(); return; }
+        if(prompt("Heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Logout'; }
     }
 
     function filterCategory(cat, el) {
@@ -216,41 +161,8 @@
         renderRoster(currentData);
     }
 
-    function loginAdmin() {
-        if(isAdmin) { location.reload(); return; }
-        if(prompt("Heslo:") === ADMIN_PASSWORD) {
-            isAdmin = true;
-            document.getElementById('admin-banner').style.display = 'block';
-            document.getElementById('admin-text').innerText = 'Logout Admin';
-        }
-    }
-
-    function toggleForm() {
-        const f = document.getElementById('add-member-form');
-        f.style.display = f.style.display === 'block' ? 'none' : 'block';
-    }
-
-    async function submitNewMember() {
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "ODOSIELAM..."; btn.disabled = true;
-
-        const d = {
-            meno: document.getElementById('new-meno').value,
-            badge: document.getElementById('new-badge').value,
-            hodnost: document.getElementById('new-hodnost').value,
-            evoc: 'N/A', zbrane: 'N/A', seb: 'N/A', medical: 'N/A',
-            dob: document.getElementById('new-dob').value,
-            foto: document.getElementById('new-foto').value,
-            tel: document.getElementById('new-tel').value
-        };
-
-        try {
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-            alert("Úspešne pridané! Počkaj chvíľu a potom obnov stránku.");
-            toggleForm();
-            btn.innerText = "ULOŽIŤ DO SYSTÉMU"; btn.disabled = false;
-        } catch(e) { alert("Chyba!"); btn.disabled = false; btn.innerText = "ULOŽIŤ DO SYSTÉMU"; }
-    }
+    function toggleForm() { const f = document.getElementById('add-member-form'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
+    function handleSearch() { const q = document.getElementById('search-input').value.toLowerCase(); Array.from(document.getElementsByClassName('rank-card')).forEach(c => c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q))); }
 
     loadData();
 </script>
