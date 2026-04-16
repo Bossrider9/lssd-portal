@@ -5,84 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LSSD | Training Bureau Database</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f0f; color: #e0e0e0; margin: 0; padding: 0; }
-        header { background: linear-gradient(135deg, #1b3022 0%, #0a140d 100%); border-bottom: 4px solid #c5a059; padding: 45px 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.7); }
-        header h1 { margin: 0; color: #c5a059; letter-spacing: 1px; font-size: 2.2em; text-transform: uppercase; font-weight: 800; }
-        header p { margin: 12px 0 0; font-size: 1.1em; color: #d1d1d1; text-transform: uppercase; letter-spacing: 3px; font-weight: 300; }
-        .container { padding: 30px; max-width: 1100px; margin: auto; }
-        .loading { text-align: center; font-size: 1.2em; color: #c5a059; margin-top: 50px; }
-        .rank-card { background: #1a1a1a; border-left: 6px solid #c5a059; padding: 22px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease; }
-        .rank-card:hover { transform: translateY(-2px); background: #222222; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
-        .badge-pill { background: #c5a059; color: #1b3022; padding: 5px 14px; font-weight: 900; border-radius: 3px; margin-right: 18px; font-size: 0.85em; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); min-width: 40px; text-align: center; }
-        .info-main { display: flex; align-items: center; }
-        .name { font-size: 1.3em; font-weight: 600; color: #ffffff; }
-        .badge-number { color: #c5a059; font-weight: 400; font-size: 0.9em; margin-left: 8px; }
-        .certs { display: flex; gap: 15px; font-size: 0.85em; color: #cccccc; flex-wrap: wrap; }
-        .cert-item { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(197, 160, 89, 0.2); min-width: 100px; }
-        .cert-item b { color: #c5a059; margin-right: 5px; display: block; font-size: 0.75em; text-transform: uppercase; margin-bottom: 2px; }
-        .status-passed { color: #4CAF50; font-weight: bold; text-shadow: 0 0 5px rgba(76, 175, 80, 0.3); }
-        h2 { border-bottom: 1px solid #333; padding-bottom: 10px; color: #c5a059; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
-        footer { text-align: center; padding: 30px; color: #444; font-size: 0.8em; margin-top: 60px; border-top: 1px solid #222; line-height: 1.6; }
+        :root {
+            --primary: #c5a059;
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --sidebar-width: 60px;
+            --sidebar-expanded: 260px;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #0a140d;
+            border-right: 2px solid var(--primary);
+            position: fixed;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar:hover { width: var(--sidebar-expanded); }
+
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            white-space: nowrap;
+            color: #bbb;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
+        .nav-item.active { background: rgba(197, 160, 89, 0.2); color: var(--primary); border-left: 4px solid var(--primary); }
+        .nav-icon { min-width: 25px; margin-right: 20px; font-size: 1.2em; text-align: center; }
+
+        /* MAIN CONTENT */
+        #main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { background: linear-gradient(135deg, #1b3022 0%, #0a140d 100%); border-bottom: 4px solid var(--primary); padding: 30px; text-align: center; }
+        header h1 { margin: 0; color: var(--primary); font-size: 1.8em; text-transform: uppercase; }
+
+        .search-container {
+            padding: 20px 30px;
+            background: #151515;
+            display: flex;
+            gap: 15px;
+        }
+
+        #search-input {
+            flex: 1;
+            background: #222;
+            border: 1px solid #333;
+            padding: 12px 20px;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        #search-input:focus { outline: 1px solid var(--primary); border-color: var(--primary); }
+
+        .container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+        /* CARDS */
+        .rank-card { 
+            background: var(--card-bg); 
+            border-left: 6px solid var(--primary); 
+            padding: 20px; 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-radius: 5px;
+            transition: 0.2s;
+        }
+
+        .info-main { display: flex; flex-direction: column; }
+        .name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .name { font-size: 1.2em; font-weight: bold; color: white; }
+        .dob-label { font-size: 0.8em; color: #777; }
+        .badge-pill { background: var(--primary); color: #1b3022; padding: 2px 8px; font-weight: bold; border-radius: 3px; font-size: 0.8em; }
+
+        .certs-grid { display: flex; gap: 10px; }
+        .cert-box { 
+            background: rgba(255,255,255,0.03); 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            border: 1px solid rgba(197, 160, 89, 0.1);
+            text-align: center;
+            min-width: 90px;
+        }
+        .cert-label { display: block; font-size: 0.65em; color: var(--primary); text-transform: uppercase; margin-bottom: 3px; }
+        .cert-val { font-size: 0.9em; font-weight: 500; }
+        .status-passed { color: #4CAF50; font-weight: bold; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Los Santos Sheriff Department</h1>
-    <p>Training Bureau Database</p>
-</header>
-
-<div class="container" id="roster-container">
-    <div class="loading">Inicilizujem prístup k zabezpečenej databáze...</div>
+<div id="sidebar">
+    <div style="padding: 20px; color: var(--primary); font-weight: bold; border-bottom: 1px solid #1b3022;">LSSD TB</div>
+    <div class="nav-item active" onclick="filterCategory('all', this)"><span class="nav-icon">📊</span><span>Všeobecný prehľad</span></div>
+    <div class="nav-item" onclick="filterCategory('evoc', this)"><span class="nav-icon">🚔</span><span>EVOC Certifikácie</span></div>
+    <div class="nav-item" onclick="filterCategory('weapons', this)"><span class="nav-icon">🔫</span><span>Zbraňové kvalifikácie</span></div>
+    <div class="nav-item" onclick="filterCategory('seb', this)"><span class="nav-icon">🦅</span><span>SEB Divízia</span></div>
+    <div class="nav-item" onclick="filterCategory('medical', this)"><span class="nav-icon">🚑</span><span>Medical / EMT</span></div>
 </div>
 
-<footer>
-    OFFICIAL GOVERNMENT DATABASE - LSSD AUTHORIZED ACCESS ONLY<br>
-    UNAUTHORIZED ATTEMPT TO ACCESS PROTECTED DATA IS A FELONY UNDER CALIFORNIA PENAL CODE 502<br>
-    &copy; 2026 Los Santos County Sheriff's Department
-</footer>
+<div id="main-content">
+    <header>
+        <h1>Los Santos Sheriff Department</h1>
+        <p style="margin:5px 0 0; color:#777; letter-spacing:2px; font-size:0.9em;">Training Bureau Database</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Vyhľadať podľa mena, BN (#101) alebo DOB (01/01/1990)..." onkeyup="handleSearch()">
+    </div>
+
+    <div class="container" id="roster-container">
+        <div style="text-align: center; margin-top: 50px; color: var(--primary);">Pripájanie k šifrovanej databáze...</div>
+    </div>
+</div>
 
 <script>
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
+    let currentData = [];
+    let currentFilter = 'all';
 
     async function loadRoster() {
         try {
             const response = await fetch(realCsvUrl);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1); 
+            const csv = await response.text();
+            const rows = csv.split('\n').slice(1);
             
-            const container = document.getElementById('roster-container');
-            container.innerHTML = '<h2>Personnel Training Records</h2>';
+            currentData = rows.map(row => {
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
+                return {
+                    meno: cols[0] || "",
+                    badge: cols[1] || "",
+                    hodnost: cols[2] || "",
+                    evoc: cols[3] || "",
+                    zbrane: cols[4] || "",
+                    seb: cols[5] || "",
+                    medical: cols[6] || "",
+                    dob: cols[7] || ""
+                };
+            }).filter(d => d.meno !== "");
 
-            rows.forEach(row => {
-                const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/"/g, '').trim());
-                
-                if (columns.length >= 3 && columns[0] !== "") {
-                    // Meno, Badge, Hodnost, EVOC, Zbrane, SEB, Medical
-                    const [meno, badge, hodnost, evoc, zbrane, seb, medical] = columns;
-
-                    const card = document.createElement('div');
-                    card.className = 'rank-card';
-                    card.innerHTML = `
-                        <div class="info-main">
-                            <span class="badge-pill">${hodnost || 'DEP'}</span>
-                            <div class="name">${meno} <span class="badge-number">#${badge}</span></div>
-                        </div>
-                        <div class="certs">
-                            <div class="cert-item"><b>EVOC</b> <span class="${evoc ? 'status-passed' : ''}">${evoc || 'N/A'}</span></div>
-                            <div class="cert-item"><b>Weapons</b> <span class="${zbrane ? 'status-passed' : ''}">${zbrane || 'N/A'}</span></div>
-                            <div class="cert-item"><b>SEB</b> <span class="${seb ? 'status-passed' : ''}">${seb || 'N/A'}</span></div>
-                            <div class="cert-item"><b>Medical</b> <span class="${medical ? 'status-passed' : ''}">${medical || 'N/A'}</span></div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-            });
-        } catch (error) {
-            document.getElementById('roster-container').innerHTML = '<div style="color:#ff4444; text-align:center;">DATABASE ERROR: ACCESS DENIED</div>';
-            console.error(error);
+            renderRoster(currentData);
+        } catch (e) {
+            console.error(e);
         }
+    }
+
+    function renderRoster(data) {
+        const container = document.getElementById('roster-container');
+        container.innerHTML = "";
+
+        data.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'rank-card';
+            card.setAttribute('data-name', p.meno.toLowerCase());
+            card.setAttribute('data-badge', p.badge.toLowerCase());
+            card.setAttribute('data-dob', p.dob.toLowerCase());
+
+            let certsHtml = "";
+            if (currentFilter === 'all') {
+                certsHtml = `
+                    <div class="cert-box"><span class="cert-label">EVOC</span><span class="cert-val ${p.evoc ? 'status-passed' : ''}">${p.evoc || 'N/A'}</span></div>
+                    <div class="cert-box"><span class="cert-label">Weapons</span><span class="cert-val ${p.zbrane ? 'status-passed' : ''}">${p.zbrane || 'N/A'}</span></div>
+                    <div class="cert-box"><span class="cert-label">SEB</span><span class="cert-val ${p.seb ? 'status-passed' : ''}">${p.seb || 'N/A'}</span></div>
+                `;
+            } else {
+                const val = p[currentFilter];
+                certsHtml = `<div class="cert-box" style="min-width:200px;"><span class="cert-label">${currentFilter.toUpperCase()} STATUS</span><span class="cert-val ${val ? 'status-passed' : ''}">${val || 'NOT QUALIFIED'}</span></div>`;
+            }
+
+            card.innerHTML = `
+                <div class="info-main">
+                    <div class="name-row">
+                        <span class="badge-pill">${p.hodnost}</span>
+                        <span class="name">${p.meno}</span>
+                        <span style="color:var(--primary)">#${p.badge}</span>
+                    </div>
+                    <div class="dob-label">DOB: ${p.dob || 'Unknown'}</div>
+                </div>
+                <div class="certs-grid">${certsHtml}</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function handleSearch() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const cards = document.getElementsByClassName('rank-card');
+
+        Array.from(cards).forEach(card => {
+            const match = card.getAttribute('data-name').includes(query) || 
+                          card.getAttribute('data-badge').includes(query) || 
+                          card.getAttribute('data-dob').includes(query);
+            card.classList.toggle('hidden', !match);
+        });
+    }
+
+    function filterCategory(cat, el) {
+        currentFilter = cat;
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        renderRoster(currentData);
+        handleSearch();
     }
 
     loadRoster();
