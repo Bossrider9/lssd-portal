@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSSD | Training Bureau</title>
+    <title>LSSD | Training Bureau Database</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
         :root { --primary: #c5a059; --bg-dark: #0a0a0a; --card-bg: #161616; --sidebar-width: 70px; --sidebar-expanded: 280px; }
@@ -40,7 +40,7 @@
         .license-list { display: flex; flex-wrap: wrap; gap: 5px; }
         .license-tag { background: #222; border: 1px solid #444; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
         .admin-check-list { text-align: left; background: #222; padding: 10px; border-radius: 5px; border: 1px solid #444; }
-        .admin-check-list label { display: block; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; }
+        .admin-check-list label { display: block; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; color: #ccc; }
         .update-btn { background: var(--primary); color: black; border: none; padding: 12px; width: 80%; margin: 20px auto; display: block; font-weight: bold; cursor: pointer; border-radius: 5px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; z-index: 10; }
         .hidden { display: none !important; }
@@ -70,10 +70,10 @@
             <input type="text" id="new-tel" placeholder="Telefón">
             <input type="text" id="new-foto" placeholder="Link na foto">
         </div>
-        <button onclick="submitMember('create')" style="display:block; margin: 10px auto; background: var(--primary); border:none; padding: 8px 20px; cursor:pointer; font-weight:bold;">ULOŽIŤ</button>
+        <button onclick="submitMember('create')" style="display:block; margin: 10px auto; background: var(--primary); border:none; padding: 8px 20px; cursor:pointer; font-weight:bold;">ULOŽIŤ DO SYSTÉMU</button>
     </div>
-    <div class="search-bar-wrapper"><input type="text" id="search-input" placeholder="Hľadať..." onkeyup="handleSearch()"></div>
-    <div class="container" id="roster-container">Načítavam dáta...</div>
+    <div class="search-bar-wrapper"><input type="text" id="search-input" placeholder="Hľadať podľa mena, badge..." onkeyup="handleSearch()"></div>
+    <div class="container" id="roster-container">Prístup k dátam Training Bureau...</div>
 </div>
 
 <div id="profile-modal"><div class="modal-content"><span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span><div class="modal-header"></div><div class="modal-body" id="modal-data"></div></div></div>
@@ -85,43 +85,56 @@
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
+    // Možnosti s Emoji presne podľa zadania
     const options = {
         evoc: [
-            {val: "N/A", desc: "N/A (Standard Operator)"},
-            {val: "Code 3 Authorized", desc: "Code 3 Authorized (Povolenie pre jazdu pod majákmi)"},
-            {val: "Pursuit Certified", desc: "Pursuit Certified (Naháňky a PIT manéver)"},
-            {val: "Off-Road / Heavy Duty", desc: "Off-Road / Heavy Duty (Lenco BearCat)"}
+            {val: "N/A", desc: "⚪ N/A (Standard Operator)"},
+            {val: "Code 3 Authorized", desc: "🚨 Code 3 Authorized (Povolenie pre jazdu pod majákmi)"},
+            {val: "Pursuit Certified", desc: "🏎️ Pursuit Certified (Naháňky a PIT manéver)"},
+            {val: "Off-Road / Heavy Duty", desc: "🚜 Off-Road / Heavy Duty (Lenco BearCat)"}
         ],
         zbrane: [
-            {val: "N/A", desc: "N/A (Standard Duty Weapon)"},
-            {val: "Marksman / Sharpshooter", desc: "Marksman / Sharpshooter (Zvýšená presnosť)"},
-            {val: "Expert", desc: "Expert (Najvyššia kvalifikácia)"},
-            {val: "Range Master / Instructor", desc: "Range Master / Instructor (Inštruktor)"},
-            {val: "Specialized Weapons", desc: "Specialized Weapons (AR-15, brokovnice)"}
+            {val: "N/A", desc: "⚪ N/A (Standard Duty Weapon)"},
+            {val: "Marksman / Sharpshooter", desc: "🎯 Marksman / Sharpshooter (Zvýšená presnosť)"},
+            {val: "Expert", desc: "🔥 Expert (Najvyššia strelecká kvalifikácia)"},
+            {val: "Range Master / Instructor", desc: "🎓 Range Master / Instructor (Inštruktor)"},
+            {val: "Specialized Weapons", desc: "🔫 Specialized Weapons (AR-15, brokovnice)"}
         ],
         seb: [
-            {val: "N/A", desc: "N/A (Patrol Personnel)"},
-            {val: "SEB Operator", desc: "SEB Operator (Taktický tím)"},
-            {val: "Reserve / Retired SEB", desc: "Reserve / Retired SEB (Záloha)"},
-            {val: "Specialist / Team Leader", desc: "Specialist / Team Leader (Ostreľovač, veliteľ)"},
-            {val: "ESD (Emergency Services Detail)", desc: "ESD (Emergency Services Detail) (Tactical Medics)"}
+            {val: "N/A", desc: "⚪ N/A (Patrol Personnel)"},
+            {val: "SEB Operator", desc: "🛡️ SEB Operator (Člen taktického tímu)"},
+            {val: "Reserve / Retired SEB", desc: "⏳ Reserve / Retired SEB (Záloha)"},
+            {val: "Specialist / Team Leader", desc: "⭐ Specialist / Team Leader (Veliteľ / Ostreľovač)"},
+            {val: "ESD (Emergency Services Detail)", desc: "🚁 ESD (Tactical Medics / Search & Rescue)"}
         ],
         medical: [
-            {val: "N/A", desc: "N/A (Basic First Aid / CPR)"},
-            {val: "First Responder", desc: "First Responder (Rozšírený kurz)"},
-            {val: "EMT-B Certified", desc: "EMT-B Certified (Licencia záchranára)"},
-            {val: "Tactical Medic (ESD)", desc: "Tactical Medic (ESD) (Špecialista SEB)"}
+            {val: "N/A", desc: "⚪ N/A (Basic First Aid / CPR)"},
+            {val: "First Responder", desc: "🩹 First Responder (Rozšírený kurz)"},
+            {val: "EMT-B Certified", desc: "🚑 EMT-B Certified (Licencia záchranára)"},
+            {val: "Tactical Medic (ESD)", desc: "⛑️ Tactical Medic (ESD) (Špecialista SEB)"}
         ]
     };
 
     async function loadData() {
         try {
-            const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`);
+            const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=0`);
             const csv = await res.text();
-            currentData = csv.split('\n').slice(1).map(row => {
+            const rows = csv.split('\n').slice(1);
+            currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
-                return { meno:c[0], badge:c[1], hodnost:c[2], evoc:c[3], zbrane:c[4], seb:c[5], medical:c[6], dob:c[7], foto:c[8], tel:c[9] };
-            }).filter(x => x.meno);
+                return { 
+                    meno: c[0] || "Neznáme meno", 
+                    badge: c[1] || "---", 
+                    hodnost: c[2] || "Officer", 
+                    evoc: c[3] || "N/A", 
+                    zbrane: c[4] || "N/A", 
+                    seb: c[5] || "N/A", 
+                    medical: c[6] || "N/A", 
+                    dob: c[7] || "N/A", 
+                    foto: c[8] || "https://i.imgur.com/8K9mS7E.png", 
+                    tel: c[9] || "N/A" 
+                };
+            }).filter(x => x.meno && x.meno !== "Neznáme meno");
             renderRoster(currentData);
         } catch (e) { console.error(e); }
     }
@@ -134,15 +147,14 @@
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
             card.setAttribute('data-search', `${p.meno} ${p.badge}`.toLowerCase());
-            let right = currentFilter === 'all' ? `<div style="color:var(--primary)">PROFIL ></div>` : `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${(p[currentFilter]||'N/A')!=='N/A'?'status-passed':''}">${p[currentFilter]||'N/A'}</span></div>`;
-            card.innerHTML = `<div class="profile-mini"><img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo"><div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div></div>${right}`;
+            let right = currentFilter === 'all' ? `<div style="color:var(--primary)">VIEW PROFILE ></div>` : `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${(p[currentFilter]||'N/A')!=='N/A'?'status-passed':''}">${p[currentFilter]||'N/A'}</span></div>`;
+            card.innerHTML = `<div class="profile-mini"><img src="${p.foto}" class="mini-photo"><div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div></div>${right}`;
             container.appendChild(card);
         });
     }
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
-        
         const createAdminSection = (cat, currentStr) => {
             const currentArr = currentStr ? currentStr.split(', ') : ["N/A"];
             let html = `<div class="admin-check-list">`;
@@ -152,24 +164,22 @@
             });
             return html + `</div>`;
         };
-
         const createPublicSection = (currentStr) => {
             const arr = currentStr ? currentStr.split(', ') : ["N/A"];
             return `<div class="license-list">${arr.map(l => `<span class="license-tag">${l}</span>`).join('')}</div>`;
         };
-
         document.getElementById('modal-data').innerHTML = `
-            <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo">
+            <img src="${p.foto}" class="modal-photo">
             <h2 style="margin:10px 0 5px;">${p.meno}</h2>
-            <div style="color:var(--primary); font-weight:bold;">${p.hodnost} #${p.badge}</div>
+            <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} #${p.badge}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>EVOC</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
-                <div class="detail-item"><b>Zbrane</b>${isAdmin ? createAdminSection('zbrane', p.zbrane) : createPublicSection(p.zbrane)}</div>
+                <div class="detail-item"><b>EVOC Certifikácie</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
+                <div class="detail-item"><b>Zbraňové kvalifikácie</b>${isAdmin ? createAdminSection('zbrane', p.zbrane) : createPublicSection(p.zbrane)}</div>
                 <div class="detail-item"><b>SEB Divízia</b>${isAdmin ? createAdminSection('seb', p.seb) : createPublicSection(p.seb)}</div>
-                <div class="detail-item"><b>Medical</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div class="detail-item"><b>DOB</b><span>${p.dob||'N/A'}</span></div>
-                    <div class="detail-item"><b>Telefón</b><span>${p.tel||'N/A'}</span></div>
+                <div class="detail-item"><b>Medical / First Aid</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <div class="detail-item"><b>DOB</b><span>${p.dob}</span></div>
+                    <div class="detail-item"><b>Telefón</b><span>${p.tel}</span></div>
                 </div>
             </div>
             ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.badge}')">AKTUALIZOVAŤ PROFIL</button>` : ''}
@@ -184,28 +194,21 @@
     }
 
     async function updateExisting(badge) {
-        const d = { 
-            action: "update", 
-            badge, 
-            evoc: getSelected('evoc'), 
-            zbrane: getSelected('zbrane'), 
-            seb: getSelected('seb'), 
-            medical: getSelected('medical') 
-        };
+        const d = { action: "update", badge, evoc: getSelected('evoc'), zbrane: getSelected('zbrane'), seb: getSelected('seb'), medical: getSelected('medical') };
         const btn = event.target; btn.innerText = "UKLADÁM..."; btn.disabled = true;
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil úspešne aktualizovaný!"); location.reload();
+        alert("Profil bol úspešne aktualizovaný!"); location.reload();
     }
 
     async function submitMember(action) {
         const d = { action, meno: document.getElementById('new-meno').value, badge: document.getElementById('new-badge').value, hodnost: document.getElementById('new-hodnost').value, dob: document.getElementById('new-dob').value, tel: document.getElementById('new-tel').value, foto: document.getElementById('new-foto').value };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Člen pridaný!"); location.reload();
+        alert("Nový člen pridaný!"); location.reload();
     }
 
     function loginAdmin() {
         if(isAdmin) { location.reload(); return; }
-        if(prompt("Heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Logout'; }
+        if(prompt("Heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Logout Admin'; }
     }
 
     function filterCategory(cat, el) {
