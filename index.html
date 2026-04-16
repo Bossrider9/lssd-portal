@@ -18,104 +18,58 @@
 
         /* SIDEBAR */
         #sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: #0d140f;
-            border-right: 1px solid #1b3022;
-            position: fixed;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
+            width: var(--sidebar-width); height: 100vh; background: #0d140f; border-right: 1px solid #1b3022;
+            position: fixed; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column;
         }
         #sidebar:hover { width: var(--sidebar-expanded); }
-
-        .nav-item {
-            padding: 18px 23px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            white-space: nowrap;
-            color: #888;
-            transition: 0.2s;
-        }
+        .nav-item { padding: 18px 23px; display: flex; align-items: center; cursor: pointer; white-space: nowrap; color: #888; transition: 0.2s; }
         .nav-item:hover { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
         .nav-item.active { background: rgba(197, 160, 89, 0.15); color: var(--primary); border-left: 4px solid var(--primary); }
         .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
 
         /* MAIN CONTENT */
         #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; display: flex; flex-direction: column; overflow-y: auto; }
-
         header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 25px; text-align: center; }
         header h1 { margin: 0; color: var(--primary); font-size: 1.6em; text-transform: uppercase; letter-spacing: 2px; }
 
+        /* ADMIN BANNER & FORM */
+        #admin-banner { display: none; background: #c5a059; color: black; padding: 15px; text-align: center; font-weight: bold; border-bottom: 2px solid #000; }
+        .admin-btn { background: black; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; font-weight: bold; }
+        #add-member-form { 
+            display: none; background: #1a1a1a; color: white; padding: 25px; max-width: 600px; margin: 20px auto; 
+            border-radius: 10px; border: 1px solid var(--primary); text-align: left; 
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-grid input { background: #222; border: 1px solid #444; padding: 10px; color: white; border-radius: 5px; width: 100%; box-sizing: border-box; }
+
         .search-bar-wrapper { padding: 20px 40px; background: #111; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px 25px; color: white; border-radius: 8px; font-size: 1em; outline: none; }
-        #search-input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(197,160,89,0.2); }
+        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px 25px; color: white; border-radius: 8px; outline: none; }
 
         .container { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
 
         /* CARDS */
         .rank-card { 
-            background: var(--card-bg); 
-            border: 1px solid #222;
-            padding: 20px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
+            background: var(--card-bg); border: 1px solid #222; padding: 20px; margin-bottom: 15px; 
+            display: flex; justify-content: space-between; align-items: center; border-radius: 10px; cursor: pointer; transition: 0.2s;
         }
         .rank-card:hover { border-color: var(--primary); background: #1d1d1d; }
-
         .profile-mini { display: flex; align-items: center; gap: 20px; }
-        .mini-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #333; }
+        .mini-photo { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #333; }
         .name-info b { display: block; font-size: 1.1em; color: white; }
         .name-info span { font-size: 0.85em; color: #777; }
+        .status-box { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px 20px; border-radius: 5px; text-align: center; min-width: 160px; }
         .status-passed { color: #4CAF50; font-weight: bold; }
 
-        /* PROFILE MODAL */
-        #profile-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #161616;
-            width: 500px;
-            border-radius: 15px;
-            border: 1px solid var(--primary);
-            overflow: hidden;
-            position: relative;
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .modal-header { height: 120px; background: linear-gradient(to right, #1b3022, #0d140f); }
+        /* MODAL */
+        #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #161616; width: 500px; border-radius: 15px; border: 1px solid var(--primary); overflow: hidden; position: relative; }
+        .modal-header { height: 100px; background: linear-gradient(to right, #1b3022, #0d140f); }
         .modal-body { padding: 30px; text-align: center; margin-top: -60px; }
         .modal-photo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; background: #222; margin-bottom: 15px; }
-        .modal-name { font-size: 1.8em; color: white; margin: 10px 0; }
         .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; }
         .detail-item b { display: block; font-size: 0.7em; color: var(--primary); text-transform: uppercase; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #777; }
-
         .hidden { display: none !important; }
-
-        /* STATUS BOX STYLE FROM SCREENSHOT */
-        .status-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #333;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-align: center;
-            min-width: 150px;
-        }
     </style>
 </head>
 <body>
@@ -127,6 +81,10 @@
     <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Firearms Bureau</span></div>
     <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield-quarter nav-icon'></i><span>SEB Tactical</span></div>
     <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical Services</span></div>
+    
+    <div style="margin-top: auto; border-top: 1px solid #1b3022;">
+        <div class="nav-item" onclick="loginAdmin()"><i class='bx bx-lock-alt nav-icon' id="admin-icon"></i><span id="admin-text">Admin Login</span></div>
+    </div>
 </div>
 
 <div id="main-content">
@@ -135,8 +93,28 @@
         <p style="color:#555; font-size:0.8em; margin:5px 0 0; letter-spacing:4px;">OFFICIAL TRAINING DATABASE</p>
     </header>
 
+    <div id="admin-banner">
+        ADMIN MODE ACTIVE | 
+        <button class="admin-btn" onclick="toggleForm()">+ PRIDAŤ NOVÉHO ČLENA</button>
+        <button class="admin-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/'+SPREADSHEET_ID+'/edit', '_blank')">UPRAVIŤ TABUĽKU</button>
+    </div>
+
+    <div id="add-member-form">
+        <h3 style="margin-top:0; color:var(--primary);">Registrácia nového člena</h3>
+        <div class="form-grid">
+            <input type="text" id="new-meno" placeholder="Meno a Priezvisko">
+            <input type="text" id="new-badge" placeholder="Badge #">
+            <input type="text" id="new-hodnost" placeholder="Hodnosť">
+            <input type="text" id="new-dob" placeholder="Dátum narodenia">
+            <input type="text" id="new-tel" placeholder="Telefónne číslo">
+            <input type="text" id="new-foto" placeholder="Link na foto (nepovinné)">
+        </div>
+        <button id="submit-btn" onclick="submitNewMember()" style="background:var(--primary); border:none; padding:10px 20px; font-weight:bold; cursor:pointer;">ULOŽIŤ DO SYSTÉMU</button>
+        <button onclick="toggleForm()" style="background:#444; color:white; border:none; padding:10px 20px; margin-left:10px; cursor:pointer;">ZRUŠIŤ</button>
+    </div>
+
     <div class="search-bar-wrapper">
-        <input type="text" id="search-input" placeholder="Search by Name, Badge #, DOB or Phone..." onkeyup="handleSearch()">
+        <input type="text" id="search-input" placeholder="Search by Name, Badge #, DOB..." onkeyup="handleSearch()">
     </div>
 
     <div class="container" id="roster-container">
@@ -144,108 +122,90 @@
     </div>
 </div>
 
-<div id="profile-modal" onclick="closeProfile(event)">
+<div id="profile-modal" onclick="this.style.display='none'">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span>
         <div class="modal-header"></div>
-        <div class="modal-body" id="modal-data">
-            </div>
+        <div class="modal-body" id="modal-data"></div>
     </div>
 </div>
 
 <script>
-    // TU VLOŽ SVOJE NOVÉ ID TABUĽKY
+    // --- KONFIGURÁCIA (NASTAVENÉ) ---
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec'; 
+    const ADMIN_PASSWORD = "LSSD2026"; 
+    // ------------------------------------------
+
     const realCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
-    
     let currentData = [];
     let currentFilter = 'all';
+    let isAdmin = false;
 
     async function loadData() {
         try {
             const response = await fetch(realCsvUrl);
             const csv = await response.text();
             const rows = csv.split('\n').slice(1);
-            
             currentData = rows.map(row => {
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
                 return {
-                    meno: cols[0], badge: cols[1], hodnost: cols[2], 
-                    evoc: cols[3], zbrane: cols[4], seb: cols[5], 
-                    medical: cols[6], dob: cols[7], foto: cols[8], tel: cols[9]
+                    meno: cols[0], badge: cols[1], hodnost: cols[2], evoc: cols[3], 
+                    zbrane: cols[4], seb: cols[5], medical: cols[6], dob: cols[7], foto: cols[8], tel: cols[9]
                 };
             }).filter(d => d.meno);
             renderRoster(currentData);
-        } catch (e) { 
-            console.error(e);
-            document.getElementById('roster-container').innerHTML = '<div style="text-align:center;color:red;">CHYBA: Nepodarilo sa načítať dáta. Skontroluj ID tabuľky a zdieľanie.</div>';
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderRoster(data) {
         const container = document.getElementById('roster-container');
         container.innerHTML = "";
-        
-        data.forEach((p) => {
+        data.forEach(p => {
             const card = document.createElement('div');
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
-            card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.dob} ${p.tel}`.toLowerCase());
+            card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.dob}`.toLowerCase());
 
-            let rightSideHtml = "";
+            let rightHtml = "";
             if (currentFilter === 'all') {
-                rightSideHtml = `<div style="color: var(--primary); font-weight: bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>`;
+                rightHtml = `<div style="color:var(--primary); font-weight:bold;">VIEW PROFILE <i class='bx bx-chevron-right'></i></div>`;
             } else {
-                const val = p[currentFilter] || 'NOT QUALIFIED';
-                const isPassed = val.toLowerCase() !== 'not qualified' && val.toLowerCase() !== 'n/a';
-                rightSideHtml = `
-                    <div class="status-box">
-                        <span style="display:block; font-size:0.65em; color:#777; text-transform:uppercase;">${currentFilter.toUpperCase()} STATUS</span>
-                        <span class="${isPassed ? 'status-passed' : ''}" style="font-size:0.9em;">${val}</span>
-                    </div>
-                `;
+                const val = p[currentFilter] || 'N/A';
+                const passed = val.toLowerCase() !== 'n/a' && val !== "";
+                rightHtml = `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${passed?'status-passed':''}">${val}</span></div>`;
             }
 
             card.innerHTML = `
                 <div class="profile-mini">
-                    <img src="${p.foto || 'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
-                    <div class="name-info">
-                        <b>${p.meno}</b>
-                        <span>${p.hodnost} • #${p.badge}</span>
-                        <div style="font-size: 0.75em; color: #555; margin-top: 4px;">DOB: ${p.dob || 'Unknown'}</div>
-                    </div>
-                </div>
-                ${rightSideHtml}
-            `;
+                    <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="mini-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
+                    <div class="name-info"><b>${p.meno}</b><span>${p.hodnost} • #${p.badge}</span></div>
+                </div>${rightHtml}`;
             container.appendChild(card);
         });
     }
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
-        const body = document.getElementById('modal-data');
-        body.innerHTML = `
-            <img src="${p.foto || 'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
-            <div class="modal-name">${p.meno}</div>
-            <div style="color:var(--primary); font-weight:bold;">${p.hodnost} #${p.badge}</div>
-            
+        document.getElementById('modal-data').innerHTML = `
+            <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo" onerror="this.src='https://i.imgur.com/8K9mS7E.png'">
+            <div style="font-size:1.8em; color:white;">${p.meno}</div>
+            <div style="color:var(--primary); font-weight:bold; margin-bottom:20px;">${p.hodnost} #${p.badge}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>Date of Birth</b>${p.dob || 'Unknown'}</div>
-                <div class="detail-item"><b>Phone Number</b>${p.tel || 'N/A'}</div>
-                <div class="detail-item"><b>EVOC Status</b>${p.evoc || 'Not Qualified'}</div>
-                <div class="detail-item"><b>Firearms</b>${p.zbrane || 'Not Qualified'}</div>
-                <div class="detail-item"><b>Tactical (SEB)</b>${p.seb || 'Not Qualified'}</div>
-                <div class="detail-item"><b>Medical</b>${p.medical || 'Not Qualified'}</div>
-            </div>
-        `;
+                <div class="detail-item"><b>DOB</b>${p.dob||'Unknown'}</div>
+                <div class="detail-item"><b>Phone</b>${p.tel||'N/A'}</div>
+                <div class="detail-item"><b>EVOC</b>${p.evoc||'N/A'}</div>
+                <div class="detail-item"><b>Firearms</b>${p.zbrane||'N/A'}</div>
+                <div class="detail-item"><b>SEB</b>${p.seb||'N/A'}</div>
+                <div class="detail-item"><b>Medical</b>${p.medical||'N/A'}</div>
+            </div>`;
         modal.style.display = 'flex';
     }
 
     function handleSearch() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const cards = document.getElementsByClassName('rank-card');
-        Array.from(cards).forEach(card => {
-            card.classList.toggle('hidden', !card.getAttribute('data-search').includes(query));
+        const q = document.getElementById('search-input').value.toLowerCase();
+        Array.from(document.getElementsByClassName('rank-card')).forEach(c => {
+            c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q));
         });
     }
 
@@ -254,11 +214,45 @@
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         renderRoster(currentData);
-        handleSearch();
+    }
+
+    function loginAdmin() {
+        if(isAdmin) { location.reload(); return; }
+        if(prompt("Heslo:") === ADMIN_PASSWORD) {
+            isAdmin = true;
+            document.getElementById('admin-banner').style.display = 'block';
+            document.getElementById('admin-text').innerText = 'Logout Admin';
+        }
+    }
+
+    function toggleForm() {
+        const f = document.getElementById('add-member-form');
+        f.style.display = f.style.display === 'block' ? 'none' : 'block';
+    }
+
+    async function submitNewMember() {
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "ODOSIELAM..."; btn.disabled = true;
+
+        const d = {
+            meno: document.getElementById('new-meno').value,
+            badge: document.getElementById('new-badge').value,
+            hodnost: document.getElementById('new-hodnost').value,
+            evoc: 'N/A', zbrane: 'N/A', seb: 'N/A', medical: 'N/A',
+            dob: document.getElementById('new-dob').value,
+            foto: document.getElementById('new-foto').value,
+            tel: document.getElementById('new-tel').value
+        };
+
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+            alert("Úspešne pridané! Počkaj chvíľu a potom obnov stránku.");
+            toggleForm();
+            btn.innerText = "ULOŽIŤ DO SYSTÉMU"; btn.disabled = false;
+        } catch(e) { alert("Chyba!"); btn.disabled = false; btn.innerText = "ULOŽIŤ DO SYSTÉMU"; }
     }
 
     loadData();
 </script>
-
 </body>
 </html>
