@@ -20,7 +20,7 @@
         .admin-btn { background: black; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
         #add-member-form { display: none; background: #1a1a1a; padding: 20px; border-bottom: 1px solid var(--primary); }
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 900px; margin: 0 auto; }
-        .form-grid input { background: #222; border: 1px solid #444; padding: 8px; color: white; border-radius: 4px; }
+        .form-grid input { background: #222; border: 1px solid #444; padding: 8px; color: white; border-radius: 4px; width: 100%; box-sizing: border-box; }
         .search-bar-wrapper { padding: 20px 40px; background: #111; position: sticky; top: 0; z-index: 100; }
         #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px; color: white; border-radius: 8px; outline: none; }
         .container { padding: 20px 40px; }
@@ -31,15 +31,18 @@
         .status-box { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 8px 15px; border-radius: 5px; text-align: center; min-width: 140px; }
         .status-passed { color: #4CAF50; font-weight: bold; }
         #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #161616; width: 500px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; }
+        .modal-content { background: #161616; width: 550px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; max-height: 90vh; overflow-y: auto; }
         .modal-header { height: 80px; background: #1b3022; }
         .modal-body { padding: 0 30px; text-align: center; margin-top: -50px; }
         .modal-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; background: #222; }
-        .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
-        .detail-item b { display: block; font-size: 0.7em; color: var(--primary); text-transform: uppercase; }
-        .admin-select { width: 100%; background: #222; color: white; border: 1px solid var(--primary); padding: 5px; margin-top: 5px; }
-        .update-btn { background: var(--primary); color: black; border: none; padding: 10px; width: 80%; margin-top: 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; }
+        .modal-details { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
+        .detail-item b { display: block; font-size: 0.75em; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
+        .license-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .license-tag { background: #222; border: 1px solid #444; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
+        .admin-check-list { text-align: left; background: #222; padding: 10px; border-radius: 5px; border: 1px solid #444; }
+        .admin-check-list label { display: block; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; }
+        .update-btn { background: var(--primary); color: black; border: none; padding: 12px; width: 80%; margin: 20px auto; display: block; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; z-index: 10; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -82,6 +85,35 @@
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
+    const options = {
+        evoc: [
+            {val: "N/A", desc: "N/A (Standard Operator)"},
+            {val: "Code 3 Authorized", desc: "Code 3 Authorized (Povolenie pre jazdu pod majákmi)"},
+            {val: "Pursuit Certified", desc: "Pursuit Certified (Naháňky a PIT manéver)"},
+            {val: "Off-Road / Heavy Duty", desc: "Off-Road / Heavy Duty (Lenco BearCat)"}
+        ],
+        zbrane: [
+            {val: "N/A", desc: "N/A (Standard Duty Weapon)"},
+            {val: "Marksman / Sharpshooter", desc: "Marksman / Sharpshooter (Zvýšená presnosť)"},
+            {val: "Expert", desc: "Expert (Najvyššia kvalifikácia)"},
+            {val: "Range Master / Instructor", desc: "Range Master / Instructor (Inštruktor)"},
+            {val: "Specialized Weapons", desc: "Specialized Weapons (AR-15, brokovnice)"}
+        ],
+        seb: [
+            {val: "N/A", desc: "N/A (Patrol Personnel)"},
+            {val: "SEB Operator", desc: "SEB Operator (Taktický tím)"},
+            {val: "Reserve / Retired SEB", desc: "Reserve / Retired SEB (Záloha)"},
+            {val: "Specialist / Team Leader", desc: "Specialist / Team Leader (Ostreľovač, veliteľ)"},
+            {val: "ESD (Emergency Services Detail)", desc: "ESD (Emergency Services Detail) (Tactical Medics)"}
+        ],
+        medical: [
+            {val: "N/A", desc: "N/A (Basic First Aid / CPR)"},
+            {val: "First Responder", desc: "First Responder (Rozšírený kurz)"},
+            {val: "EMT-B Certified", desc: "EMT-B Certified (Licencia záchranára)"},
+            {val: "Tactical Medic (ESD)", desc: "Tactical Medic (ESD) (Špecialista SEB)"}
+        ]
+    };
+
     async function loadData() {
         try {
             const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`);
@@ -110,37 +142,59 @@
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
-        const options = {
-            evoc: ["N/A", "Class A", "Class B", "Class C"],
-            zbrane: ["N/A", "Certified", "Expert", "Instructor"],
-            seb: ["N/A", "Active", "Reserve", "Specialist"],
-            medical: ["N/A", "EMT-B", "EMT-P", "Medical Dir."]
+        
+        const createAdminSection = (cat, currentStr) => {
+            const currentArr = currentStr ? currentStr.split(', ') : ["N/A"];
+            let html = `<div class="admin-check-list">`;
+            options[cat].forEach(opt => {
+                const checked = currentArr.includes(opt.val) ? 'checked' : '';
+                html += `<label><input type="checkbox" class="check-${cat}" value="${opt.val}" ${checked}> ${opt.desc}</label>`;
+            });
+            return html + `</div>`;
         };
 
-        const createSelect = (cat, current) => isAdmin ? `<select id="edit-${cat}" class="admin-select">${options[cat].map(o => `<option value="${o}" ${o===current?'selected':''}>${o}</option>`).join('')}</select>` : `<span>${current||'N/A'}</span>`;
+        const createPublicSection = (currentStr) => {
+            const arr = currentStr ? currentStr.split(', ') : ["N/A"];
+            return `<div class="license-list">${arr.map(l => `<span class="license-tag">${l}</span>`).join('')}</div>`;
+        };
 
         document.getElementById('modal-data').innerHTML = `
             <img src="${p.foto||'https://i.imgur.com/8K9mS7E.png'}" class="modal-photo">
             <h2 style="margin:10px 0 5px;">${p.meno}</h2>
             <div style="color:var(--primary); font-weight:bold;">${p.hodnost} #${p.badge}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>EVOC</b>${createSelect('evoc', p.evoc)}</div>
-                <div class="detail-item"><b>Zbrane</b>${createSelect('zbrane', p.zbrane)}</div>
-                <div class="detail-item"><b>SEB Divízia</b>${createSelect('seb', p.seb)}</div>
-                <div class="detail-item"><b>Medical</b>${createSelect('medical', p.medical)}</div>
-                <div class="detail-item"><b>DOB</b><span>${p.dob||'N/A'}</span></div>
-                <div class="detail-item"><b>Telefón</b><span>${p.tel||'N/A'}</span></div>
+                <div class="detail-item"><b>EVOC</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
+                <div class="detail-item"><b>Zbrane</b>${isAdmin ? createAdminSection('zbrane', p.zbrane) : createPublicSection(p.zbrane)}</div>
+                <div class="detail-item"><b>SEB Divízia</b>${isAdmin ? createAdminSection('seb', p.seb) : createPublicSection(p.seb)}</div>
+                <div class="detail-item"><b>Medical</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="detail-item"><b>DOB</b><span>${p.dob||'N/A'}</span></div>
+                    <div class="detail-item"><b>Telefón</b><span>${p.tel||'N/A'}</span></div>
+                </div>
             </div>
             ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.badge}')">AKTUALIZOVAŤ PROFIL</button>` : ''}
         `;
         modal.style.display = 'flex';
     }
 
+    function getSelected(cat) {
+        const checks = document.querySelectorAll(`.check-${cat}:checked`);
+        const vals = Array.from(checks).map(c => c.value);
+        return vals.length > 0 ? vals.join(', ') : "N/A";
+    }
+
     async function updateExisting(badge) {
-        const d = { action: "update", badge, evoc: document.getElementById('edit-evoc').value, zbrane: document.getElementById('edit-zbrane').value, seb: document.getElementById('edit-seb').value, medical: document.getElementById('edit-medical').value };
+        const d = { 
+            action: "update", 
+            badge, 
+            evoc: getSelected('evoc'), 
+            zbrane: getSelected('zbrane'), 
+            seb: getSelected('seb'), 
+            medical: getSelected('medical') 
+        };
         const btn = event.target; btn.innerText = "UKLADÁM..."; btn.disabled = true;
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Zmeny uložené!"); location.reload();
+        alert("Profil úspešne aktualizovaný!"); location.reload();
     }
 
     async function submitMember(action) {
