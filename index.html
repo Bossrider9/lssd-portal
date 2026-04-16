@@ -85,33 +85,36 @@
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
-    // Možnosti s Emoji presne podľa zadania
     const options = {
         evoc: [
             {val: "N/A", desc: "⚪ N/A (Standard Operator)"},
-            {val: "Code 3 Authorized", desc: "🚨 Code 3 Authorized (Povolenie pre jazdu pod majákmi)"},
-            {val: "Pursuit Certified", desc: "🏎️ Pursuit Certified (Naháňky a PIT manéver)"},
-            {val: "Off-Road / Heavy Duty", desc: "🚜 Off-Road / Heavy Duty (Lenco BearCat)"}
+            {val: "Code 3 Authorized", desc: "🚨 Code 3 Authorized (Majáky)"},
+            {val: "Pursuit Certified", desc: "🏎️ Pursuit Certified (PIT manéver)"},
+            {val: "Off-Road / Heavy Duty", desc: "🚜 Off-Road / Heavy Duty"},
+            {val: "HSU Certified", desc: "🏁 HSU Certified (High Speed Unit)"},
+            {val: "Motorcycle Certified", desc: "🏍️ Motorcycle Certified (Motor Unit)"}
         ],
         zbrane: [
             {val: "N/A", desc: "⚪ N/A (Standard Duty Weapon)"},
-            {val: "Marksman / Sharpshooter", desc: "🎯 Marksman / Sharpshooter (Zvýšená presnosť)"},
-            {val: "Expert", desc: "🔥 Expert (Najvyššia strelecká kvalifikácia)"},
-            {val: "Range Master / Instructor", desc: "🎓 Range Master / Instructor (Inštruktor)"},
-            {val: "Specialized Weapons", desc: "🔫 Specialized Weapons (AR-15, brokovnice)"}
+            {val: "Marksman / Sharpshooter", desc: "🎯 Marksman / Sharpshooter"},
+            {val: "Expert", desc: "🔥 Expert Qualified"},
+            {val: "Range Master / Instructor", desc: "🎓 Range Master / Instructor"},
+            {val: "Specialized Weapons", desc: "🔫 Specialized Weapons"}
         ],
         seb: [
             {val: "N/A", desc: "⚪ N/A (Patrol Personnel)"},
-            {val: "SEB Operator", desc: "🛡️ SEB Operator (Člen taktického tímu)"},
-            {val: "Reserve / Retired SEB", desc: "⏳ Reserve / Retired SEB (Záloha)"},
-            {val: "Specialist / Team Leader", desc: "⭐ Specialist / Team Leader (Veliteľ / Ostreľovač)"},
-            {val: "ESD (Emergency Services Detail)", desc: "🚁 ESD (Tactical Medics / Search & Rescue)"}
+            {val: "SEB Operator", desc: "🛡️ SEB Operator"},
+            {val: "Reserve / Retired SEB", desc: "⏳ Reserve / Retired SEB"},
+            {val: "Specialist / Team Leader", desc: "⭐ Specialist / Team Leader"},
+            {val: "ESD (Emergency Services Detail)", desc: "🚁 ESD (Tactical Medics)"}
         ],
         medical: [
             {val: "N/A", desc: "⚪ N/A (Basic First Aid / CPR)"},
-            {val: "First Responder", desc: "🩹 First Responder (Rozšírený kurz)"},
-            {val: "EMT-B Certified", desc: "🚑 EMT-B Certified (Licencia záchranára)"},
-            {val: "Tactical Medic (ESD)", desc: "⛑️ Tactical Medic (ESD) (Špecialista SEB)"}
+            {val: "First Responder", desc: "🩹 First Responder"},
+            {val: "EMT-B Certified", desc: "🚑 EMT-B Certified"},
+            {val: "Tactical Medic (ESD)", desc: "⛑️ Tactical Medic (ESD)"},
+            {val: "Air Support Pilot", desc: "🚁 ASD Pilot (Helikoptéry)"},
+            {val: "Tactical Flight Officer", desc: "📷 TFO (Pozorovateľ)"}
         ]
     };
 
@@ -173,10 +176,10 @@
             <h2 style="margin:10px 0 5px;">${p.meno}</h2>
             <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} #${p.badge}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>EVOC Certifikácie</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
+                <div class="detail-item"><b>EVOC & Specialized Driving</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
                 <div class="detail-item"><b>Zbraňové kvalifikácie</b>${isAdmin ? createAdminSection('zbrane', p.zbrane) : createPublicSection(p.zbrane)}</div>
                 <div class="detail-item"><b>SEB Divízia</b>${isAdmin ? createAdminSection('seb', p.seb) : createPublicSection(p.seb)}</div>
-                <div class="detail-item"><b>Medical / First Aid</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
+                <div class="detail-item"><b>Medical & ASD Support</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                     <div class="detail-item"><b>DOB</b><span>${p.dob}</span></div>
                     <div class="detail-item"><b>Telefón</b><span>${p.tel}</span></div>
