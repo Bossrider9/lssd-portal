@@ -55,7 +55,6 @@
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; z-index: 10; }
         .hidden { display: none !important; }
 
-        /* Specialist Classes */
         .discord-box { background: rgba(88, 101, 242, 0.1); border: 1px solid #5865F2; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
     </style>
 </head>
@@ -88,10 +87,10 @@
             <input type="text" id="new-badge" placeholder="Badge #">
             <input type="text" id="new-hodnost" placeholder="Hodnosť">
             <input type="text" id="new-discord" placeholder="Discord Nick">
-            <input type="text" id="new-callsign" placeholder="Callsign (napr. County 1)">
+            <input type="text" id="new-callsign" placeholder="Callsign">
             <input type="text" id="new-dob" placeholder="Dátum narodenia">
-            <input type="text" id="new-tel" placeholder="Telefónne číslo">
-            <input type="text" id="new-foto" placeholder="Link na fotografiu">
+            <input type="text" id="new-tel" placeholder="Telefón">
+            <input type="text" id="new-foto" placeholder="Link na foto">
         </div>
         <button onclick="submitMember('create')" style="display:block; margin: 15px auto; background: var(--primary); border:none; padding: 10px 25px; cursor:pointer; font-weight:bold; border-radius: 4px;">ULOŽIŤ DO SYSTÉMU</button>
     </div>
@@ -112,13 +111,13 @@
 </div>
 
 <script>
-    const SPREADSHEET_ID = 'TU_VLOZ_SVOJE_ID_TABULKY';
-    const SCRIPT_URL = 'TU_VLOZ_SVOJU_URL_SKRIPTU';
-    const ADMIN_PASSWORD = "LSSD2026"; // Tu si zmeň heslo
+    // PREPOJENÉ DÁTA
+    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
+    const ADMIN_PASSWORD = "LSSD2026"; 
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
-    // Možnosti licencií (presne podľa tvojich požiadaviek)
     const options = {
         evoc: [
             {val: "N/A", desc: "⚪ N/A (Standard Operator)"},
@@ -156,22 +155,15 @@
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
                 return { 
-                    meno: c[0] || "Neznáme", 
-                    badge: c[1] || "---", 
-                    hodnost: c[2] || "Officer",
-                    discord: c[3] || "N/A",
-                    callsign: c[4] || "N/A",
-                    evoc: c[5] || "N/A", 
-                    zbrane: c[6] || "N/A", 
-                    seb: c[7] || "N/A", 
-                    medical: c[8] || "N/A", 
-                    dob: c[9] || "N/A", 
-                    foto: c[10] || "https://i.imgur.com/8K9mS7E.png", 
-                    tel: c[11] || "N/A" 
+                    meno: c[0] || "", badge: c[1] || "", hodnost: c[2] || "",
+                    discord: c[3] || "N/A", callsign: c[4] || "N/A",
+                    evoc: c[5] || "N/A", zbrane: c[6] || "N/A", 
+                    seb: c[7] || "N/A", medical: c[8] || "N/A", 
+                    dob: c[9] || "N/A", foto: c[10] || "https://i.imgur.com/8K9mS7E.png", tel: c[11] || "N/A" 
                 };
             }).filter(x => x.meno && x.meno !== "A (Meno)");
             renderRoster(currentData);
-        } catch (e) { console.error("Chyba pri načítaní:", e); }
+        } catch (e) { console.error("Chyba:", e); }
     }
 
     function renderRoster(data) {
@@ -182,24 +174,13 @@
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
             card.setAttribute('data-search', `${p.meno} ${p.badge} ${p.callsign}`.toLowerCase());
-            
-            card.innerHTML = `
-                <div class="profile-mini">
-                    <img src="${p.foto}" class="mini-photo">
-                    <div>
-                        <b>${p.meno}</b><br>
-                        <small>${p.hodnost} • #${p.badge} (${p.callsign})</small>
-                    </div>
-                </div>
-                <div style="color:var(--primary); font-size: 0.8em;">ZOBRAZIŤ PROFIL <i class='bx bx-chevron-right'></i></div>
-            `;
+            card.innerHTML = `<div class="profile-mini"><img src="${p.foto}" class="mini-photo"><div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge} (${p.callsign})</small></div></div><div style="color:var(--primary)">PROFIL ></div>`;
             container.appendChild(card);
         });
     }
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
-        
         const createCheckList = (cat, currentStr) => {
             const currentArr = currentStr ? currentStr.split(', ') : ["N/A"];
             let html = `<div class="admin-check-list">`;
@@ -209,30 +190,20 @@
             });
             return html + `</div>`;
         };
-
-        const createTags = (str) => {
-            return `<div class="tag-container">${str.split(', ').map(t => `<span class="license-tag">${t}</span>`).join('')}</div>`;
-        };
+        const createTags = (str) => `<div class="tag-container">${str.split(', ').map(t => `<span class="license-tag">${t}</span>`).join('')}</div>`;
 
         document.getElementById('modal-data').innerHTML = `
             <img src="${p.foto}" class="modal-photo">
             <h2 style="margin:10px 0 5px;">${p.meno}</h2>
             <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} | ${p.callsign}</div>
-            
             <div class="modal-details">
-                ${isAdmin ? `
-                <div class="discord-box">
-                    <b><i class='bx bxl-discord-alt'></i> Discord Nick (Admin Only)</b><br>
-                    <span>${p.discord}</span>
-                </div>` : ''}
-
-                <div class="detail-item"><b>EVOC Certifikácie</b>${isAdmin ? createCheckList('evoc', p.evoc) : createTags(p.evoc)}</div>
-                <div class="detail-item"><b>Zbraňové kvalifikácie</b>${isAdmin ? createCheckList('zbrane', p.zbrane) : createTags(p.zbrane)}</div>
-                <div class="detail-item"><b>SEB Príslušnosť</b>${isAdmin ? createCheckList('seb', p.seb) : createTags(p.seb)}</div>
-                <div class="detail-item"><b>Medical & ASD</b>${isAdmin ? createCheckList('medical', p.medical) : createTags(p.medical)}</div>
-                
+                ${isAdmin ? `<div class="discord-box"><b><i class='bx bxl-discord-alt'></i> Discord (Admin Only)</b><br><span>${p.discord}</span></div>` : ''}
+                <div class="detail-item"><b>EVOC</b>${isAdmin ? createCheckList('evoc', p.evoc) : createTags(p.evoc)}</div>
+                <div class="detail-item"><b>Zbrane</b>${isAdmin ? createCheckList('zbrane', p.zbrane) : createTags(p.zbrane)}</div>
+                <div class="detail-item"><b>SEB</b>${isAdmin ? createCheckList('seb', p.seb) : createTags(p.seb)}</div>
+                <div class="detail-item"><b>Medical</b>${isAdmin ? createCheckList('medical', p.medical) : createTags(p.medical)}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; border-top: 1px solid #333; padding-top: 15px;">
-                    <div class="detail-item"><b>Dátum narodenia</b><span>${p.dob}</span></div>
+                    <div class="detail-item"><b>DOB</b><span>${p.dob}</span></div>
                     <div class="detail-item"><b>Telefón</b><span>${p.tel}</span></div>
                 </div>
             </div>
@@ -246,20 +217,10 @@
             const checked = Array.from(document.querySelectorAll(`.check-${cat}:checked`)).map(c => c.value);
             return checked.length > 0 ? checked.join(', ') : "N/A";
         };
-
-        const d = { 
-            action: "update", 
-            badge, 
-            evoc: getSelected('evoc'), 
-            zbrane: getSelected('zbrane'), 
-            seb: getSelected('seb'), 
-            medical: getSelected('medical') 
-        };
-
+        const d = { action: "update", badge, evoc: getSelected('evoc'), zbrane: getSelected('zbrane'), seb: getSelected('seb'), medical: getSelected('medical') };
         const btn = event.target; btn.innerText = "UKLADÁM..."; btn.disabled = true;
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil bol úspešne aktualizovaný!"); 
-        location.reload();
+        alert("Profil bol úspešne aktualizovaný!"); location.reload();
     }
 
     async function submitMember(action) {
@@ -275,45 +236,23 @@
             foto: document.getElementById('new-foto').value 
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Nový člen bol pridaný do databázy!");
-        location.reload();
+        alert("Nový člen bol pridaný!"); location.reload();
     }
 
     function loginAdmin() {
         if(isAdmin) { location.reload(); return; }
-        if(prompt("Zadajte prístupové heslo:") === ADMIN_PASSWORD) { 
-            isAdmin = true; 
-            document.getElementById('admin-banner').style.display = 'block'; 
-            document.getElementById('admin-text').innerText = 'Odhlásiť Admina';
-            alert("Prístup povolený. Discord údaje a editácia sú teraz viditeľné.");
-        }
+        if(prompt("Heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Odhlásiť'; }
     }
 
     function filterCategory(cat, el) {
-        currentFilter = cat;
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
-        // V tejto verzii filter prepína zobrazenie v detaile profilu, v zozname zostávajú všetci
         renderRoster(currentData);
     }
 
-    function toggleForm() { 
-        const f = document.getElementById('add-member-form'); 
-        f.style.display = f.style.display === 'block' ? 'none' : 'block'; 
-    }
-
-    function handleSearch() { 
-        const q = document.getElementById('search-input').value.toLowerCase(); 
-        Array.from(document.getElementsByClassName('rank-card')).forEach(c => {
-            c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q));
-        }); 
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('profile-modal');
-        if (event.target == modal) modal.style.display = "none";
-    }
-
+    function toggleForm() { const f = document.getElementById('add-member-form'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
+    function handleSearch() { const q = document.getElementById('search-input').value.toLowerCase(); Array.from(document.getElementsByClassName('rank-card')).forEach(c => c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q))); }
+    
     loadData();
 </script>
 </body>
