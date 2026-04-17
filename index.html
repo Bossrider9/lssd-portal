@@ -59,7 +59,8 @@
     <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC</span></div>
     <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Zbrane</span></div>
     <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield nav-icon'></i><span>SEB</span></div>
-    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical</span></div>
+    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical (POST)</span></div>
+    <div class="nav-item" onclick="filterCategory('asd', this)"><i class='bx bx-navigation nav-icon'></i><span>ASD</span></div>
     <div style="margin-top: auto; border-top: 1px solid #1b3022;">
         <div class="nav-item" onclick="loginAdmin()">
             <i class='bx bx-lock-alt nav-icon'></i><span id="admin-text">Admin Login</span>
@@ -99,16 +100,16 @@
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
     const ADMIN_PASSWORD = "LSSD2026"; 
-    // Tvoja nová URL pre predvolený obrázok
     const DEFAULT_PHOTO = "https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&";
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
     const options = {
         evoc: ["Code 3", "Pursuit", "Off-Road", "HSU", "Motor"],
-        zbrane: ["Marksman", "Expert", "Instructor"],
+        zbrane: ["Marksman", "Expert", "Less Lethal", "Instructor"],
         seb: ["Operator", "Specialist", "ESD"],
-        medical: ["EMT", "Pilot", "TFO"]
+        medical: ["POST First Aid/CPR/AED", "NARCAN Admin", "Tactical Medical (TCCC)"],
+        asd: ["Pilot", "TFO"]
     };
 
     async function loadData() {
@@ -121,7 +122,7 @@
                 return { 
                     meno: c[0], badge: c[1], hodnost: c[2], discord: c[3], callsign: c[4],
                     evoc: c[5] || "N/A", zbrane: c[6] || "N/A", seb: c[7] || "N/A", medical: c[8] || "N/A", 
-                    dob: c[9], foto: c[10] || DEFAULT_PHOTO, tel: c[11]
+                    asd: c[9] || "N/A", dob: c[10], foto: c[11] || DEFAULT_PHOTO, tel: c[12]
                 };
             }).filter(x => x.meno);
             renderRoster(currentData);
@@ -174,7 +175,8 @@
                 <div class="detail-item"><b>EVOC</b>${isAdmin ? createCheckList('evoc', p.evoc) : p.evoc}</div>
                 <div class="detail-item"><b>ZBRANE</b>${isAdmin ? createCheckList('zbrane', p.zbrane) : p.zbrane}</div>
                 <div class="detail-item"><b>SEB</b>${isAdmin ? createCheckList('seb', p.seb) : p.seb}</div>
-                <div class="detail-item"><b>MEDICAL</b>${isAdmin ? createCheckList('medical', p.medical) : p.medical}</div>
+                <div class="detail-item"><b>MEDICAL (POST)</b>${isAdmin ? createCheckList('medical', p.medical) : p.medical}</div>
+                <div class="detail-item"><b>ASD</b>${isAdmin ? createCheckList('asd', p.asd) : p.asd}</div>
             </div>
             ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.discord}')">AKTUALIZOVAŤ PODĽA DISCORDU</button>` : ''}
         `;
@@ -183,9 +185,17 @@
 
     async function updateExisting(discord) {
         const getCheck = (cat) => Array.from(document.querySelectorAll(`.check-${cat}:checked`)).map(c => c.value).join(', ') || "N/A";
-        const d = { action: "update", discord, evoc: getCheck('evoc'), zbrane: getCheck('zbrane'), seb: getCheck('seb'), medical: getCheck('medical') };
+        const d = { 
+            action: "update", 
+            discord, 
+            evoc: getCheck('evoc'), 
+            zbrane: getCheck('zbrane'), 
+            seb: getCheck('seb'), 
+            medical: getCheck('medical'),
+            asd: getCheck('asd') 
+        };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Aktualizované!"); location.reload();
+        alert("Profil aktualizovaný!"); location.reload();
     }
 
     async function submitMember(action) {
@@ -198,10 +208,16 @@
             callsign: document.getElementById('new-callsign').value,
             dob: document.getElementById('new-dob').value, 
             tel: document.getElementById('new-tel').value, 
-            foto: document.getElementById('new-foto').value || DEFAULT_PHOTO 
+            foto: document.getElementById('new-foto').value || DEFAULT_PHOTO,
+            // Automatické pridelenie základných licencií pri vytvorení
+            evoc: "Code 3, Pursuit",
+            medical: "POST First Aid/CPR/AED",
+            zbrane: "N/A",
+            seb: "N/A",
+            asd: "N/A"
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Nový člen pridaný!"); location.reload();
+        alert("Člen pridaný so základnými certifikátmi!"); location.reload();
     }
 
     function filterCategory(cat, el) {
