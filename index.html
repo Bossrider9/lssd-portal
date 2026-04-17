@@ -16,8 +16,6 @@
         .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
 
         #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
-        
-        /* HEADER VRÁTENÝ NA NÁPIS */
         header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 30px; text-align: center; }
         header h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; font-size: 2rem; font-weight: 800; }
         header p { margin: 5px 0 0; color: #888; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; }
@@ -88,7 +86,7 @@
             <input type="text" id="new-callsign" placeholder="Callsign">
             <input type="text" id="new-dob" placeholder="Dátum narodenia">
             <input type="text" id="new-tel" placeholder="Telefón">
-            <input type="text" id="new-foto" placeholder="Link na foto (prázdne = stock logo)">
+            <input type="text" id="new-foto" placeholder="Link na foto">
         </div>
         <button onclick="submitMember('create')" style="display:block; margin: 15px auto; background: var(--primary); border:none; padding: 10px 25px; cursor:pointer; font-weight:bold; border-radius: 4px;">ULOŽIŤ DO SYSTÉMU</button>
     </div>
@@ -108,9 +106,7 @@
 <script>
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
-    const ADMIN_PASSWORD = "LSSDCBD2026"; 
-    
-    // Tvoja Discord fotka nastavená ako globálna stock photo pre profily
+    const ADMIN_PASSWORD = "LSSD2026"; 
     const STOCK_PHOTO = "https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&"; 
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
@@ -126,7 +122,7 @@
     function cleanVal(val) {
         if (!val) return "";
         const v = val.trim();
-        if (v.toUpperCase() === "N/A" || v === "Žiadne licencie" || v === "" || v === "Žiadne") return "";
+        if (v.toUpperCase() === "N/A" || v === "Žiadne licencie" || v === "Žiadne" || v === "") return "";
         return v;
     }
 
@@ -137,8 +133,6 @@
             const rows = csv.split('\n').slice(1);
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
-                
-                // Kontrola fotky pre existujúce profily
                 let photoUrl = c[11];
                 if (!photoUrl || photoUrl.length < 10 || photoUrl.toLowerCase() === "n/a") { photoUrl = STOCK_PHOTO; }
 
@@ -168,10 +162,11 @@
                 tags = vals.map(v => `<span class="license-tag">${v}</span>`).join('');
             }
 
+            // TU JE ZMENA: Pridaný callsign vedľa hodnosti a badge
             card.innerHTML = `
                 <div class="profile-mini">
                     <img src="${p.foto}" class="mini-photo">
-                    <div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div>
+                    <div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge} • ${p.callsign}</small></div>
                 </div>
                 <div>${tags} <i class='bx bx-chevron-right' style="color:var(--primary)"></i></div>
             `;
@@ -196,7 +191,7 @@
         document.getElementById('modal-data').innerHTML = `
             <img src="${p.foto}" class="modal-photo">
             <h2>${p.meno}</h2>
-            <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} | ${p.callsign}</div>
+            <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} • ${p.callsign}</div>
             <div class="modal-details">
                 <div><b>EVOC:</b><br>${isAdmin ? createCheckList('evoc', p.evoc) : formatTags(p.evoc)}</div>
                 <div><b>ZBRANE:</b><br>${isAdmin ? createCheckList('zbrane', p.zbrane) : formatTags(p.zbrane)}</div>
