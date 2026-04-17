@@ -112,6 +112,12 @@
         asd: ["Pilot", "TFO"]
     };
 
+    // Funkcia na vyčistenie N/A a formátovanie dát z tabuľky
+    function cleanVal(val) {
+        if (!val || val.trim() === "" || val.trim().toUpperCase() === "N/A") return "";
+        return val.trim();
+    }
+
     async function loadData() {
         try {
             const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=0`);
@@ -120,9 +126,19 @@
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
                 return { 
-                    meno: c[0], badge: c[1], hodnost: c[2], discord: c[3], callsign: c[4],
-                    evoc: c[5] || "", zbrane: c[6] || "", seb: c[7] || "", medical: c[8] || "", 
-                    asd: c[9] || "", dob: c[10], foto: c[11] || DEFAULT_PHOTO, tel: c[12]
+                    meno: c[0], 
+                    badge: c[1], 
+                    hodnost: c[2], 
+                    discord: c[3], 
+                    callsign: c[4],
+                    evoc: cleanVal(c[5]), 
+                    zbrane: cleanVal(c[6]), 
+                    seb: cleanVal(c[7]), 
+                    medical: cleanVal(c[8]), 
+                    asd: cleanVal(c[9]), 
+                    dob: c[10], 
+                    foto: c[11] || DEFAULT_PHOTO, 
+                    tel: c[12]
                 };
             }).filter(x => x.meno);
             renderRoster(currentData);
@@ -140,7 +156,9 @@
             let infoText = `PROFIL >`;
             if (currentFilter !== 'all') {
                 const vals = p[currentFilter] ? p[currentFilter].split(', ') : [];
-                infoText = vals.length > 0 ? vals.map(v => `<span class="license-tag">${v}</span>`).join('') : `<span style="color:#555">Žiadne licencie</span>`;
+                infoText = vals.length > 0 
+                    ? vals.map(v => `<span class="license-tag">${v}</span>`).join('') 
+                    : `<span style="color:#555">Žiadne licencie</span>`;
             }
 
             card.innerHTML = `
@@ -214,7 +232,7 @@
             dob: document.getElementById('new-dob').value, 
             tel: document.getElementById('new-tel').value, 
             foto: document.getElementById('new-foto').value || DEFAULT_PHOTO,
-            // Základné certifikáty pridelené pri vytvorení
+            // TU PRIDE ZÁPIS DO TABUĽKY - už žiadne N/A
             evoc: "Code 3, Pursuit",
             medical: "POST First Aid/CPR/AED",
             zbrane: "",
