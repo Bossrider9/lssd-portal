@@ -34,6 +34,8 @@
         .profile-mini { display: flex; align-items: center; gap: 15px; }
         .mini-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; background: #333; }
 
+        .license-tag { background: rgba(197, 160, 89, 0.1); border: 1px solid var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.75em; display: inline-block; margin-left: 5px; color: var(--primary); text-transform: uppercase; font-weight: bold; }
+        
         #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: #161616; width: 550px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; max-height: 90vh; overflow-y: auto; }
         .modal-header { height: 80px; background: #1b3022; }
@@ -41,14 +43,12 @@
         .modal-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; background: #222; }
         .modal-details { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
         
-        .license-tag { background: #222; border: 1px solid #444; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; display: inline-block; margin: 2px; color: var(--primary); }
         .admin-check-list { background: #222; padding: 10px; border-radius: 5px; border: 1px solid #444; max-height: 150px; overflow-y: auto; }
         .admin-check-list label { display: block; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; }
         
         .update-btn { background: var(--primary); color: black; border: none; padding: 12px; width: 80%; margin: 20px auto; display: block; font-weight: bold; cursor: pointer; border-radius: 5px; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; }
         .hidden { display: none !important; }
-        .discord-box { background: rgba(88, 101, 242, 0.1); border: 1px solid #5865F2; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -59,7 +59,7 @@
     <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC</span></div>
     <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Zbrane</span></div>
     <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield nav-icon'></i><span>SEB</span></div>
-    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical (POST)</span></div>
+    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical</span></div>
     <div class="nav-item" onclick="filterCategory('asd', this)"><i class='bx bx-navigation nav-icon'></i><span>ASD</span></div>
     <div style="margin-top: auto; border-top: 1px solid #1b3022;">
         <div class="nav-item" onclick="loginAdmin()">
@@ -100,21 +100,20 @@
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
     const ADMIN_PASSWORD = "LSSD2026"; 
-    const DEFAULT_PHOTO = "https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&";
+    const DEFAULT_PHOTO = "https://i.imgur.com/8K9QYm7.png"; 
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
     const options = {
         evoc: ["Code 3", "Pursuit", "Off-Road", "HSU", "Motor"],
-        zbrane: ["Marksman", "Expert", "Less Lethal", "Instructor"],
+        zbrane: ["Service Handgun", "Less Lethal", "Long Rifle", "Shotgun", "Precision Rifle", "Instructor"],
         seb: ["Operator", "Specialist", "ESD"],
         medical: ["POST First Aid/CPR/AED", "NARCAN Admin", "Tactical Medical (TCCC)"],
         asd: ["Pilot", "TFO"]
     };
 
-    // Funkcia na vyčistenie N/A a formátovanie dát z tabuľky
     function cleanVal(val) {
-        if (!val || val.trim() === "" || val.trim().toUpperCase() === "N/A") return "";
+        if (!val || val.trim().toUpperCase() === "N/A" || val.trim() === "") return "";
         return val.trim();
     }
 
@@ -126,23 +125,14 @@
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
                 return { 
-                    meno: c[0], 
-                    badge: c[1], 
-                    hodnost: c[2], 
-                    discord: c[3], 
-                    callsign: c[4],
-                    evoc: cleanVal(c[5]), 
-                    zbrane: cleanVal(c[6]), 
-                    seb: cleanVal(c[7]), 
-                    medical: cleanVal(c[8]), 
-                    asd: cleanVal(c[9]), 
-                    dob: c[10], 
-                    foto: c[11] || DEFAULT_PHOTO, 
-                    tel: c[12]
+                    meno: c[0], badge: c[1], hodnost: c[2], discord: c[3], callsign: c[4],
+                    evoc: cleanVal(c[5]), zbrane: cleanVal(c[6]), seb: cleanVal(c[7]), 
+                    medical: cleanVal(c[8]), asd: cleanVal(c[9]), dob: c[10], 
+                    foto: c[11] || DEFAULT_PHOTO, tel: c[12]
                 };
             }).filter(x => x.meno);
             renderRoster(currentData);
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Chyba načítania:", e); }
     }
 
     function renderRoster(data) {
@@ -153,12 +143,10 @@
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
             
-            let infoText = `PROFIL >`;
+            let infoTags = "";
             if (currentFilter !== 'all') {
                 const vals = p[currentFilter] ? p[currentFilter].split(', ') : [];
-                infoText = vals.length > 0 
-                    ? vals.map(v => `<span class="license-tag">${v}</span>`).join('') 
-                    : `<span style="color:#555">Žiadne licencie</span>`;
+                infoTags = vals.map(v => `<span class="license-tag">${v}</span>`).join('');
             }
 
             card.innerHTML = `
@@ -169,7 +157,10 @@
                         <small>${p.hodnost} • #${p.badge} (${p.callsign})</small>
                     </div>
                 </div>
-                <div style="text-align:right">${infoText}</div>
+                <div style="display: flex; align-items: center;">
+                    ${infoTags}
+                    <i class='bx bx-chevron-right' style="margin-left: 10px; color: var(--primary)"></i>
+                </div>
             `;
             container.appendChild(card);
         });
@@ -185,7 +176,7 @@
         };
 
         const formatTags = (str) => {
-            if(!str || str === "") return `<span style="color:#555">Žiadne záznamy</span>`;
+            if(!str || str === "") return `<span style="color:#555; font-size: 0.8em;">Žiadne certifikácie</span>`;
             return str.split(', ').map(v => `<span class="license-tag">${v}</span>`).join('');
         };
 
@@ -194,14 +185,13 @@
             <h2 style="margin:10px 0 5px;">${p.meno}</h2>
             <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} | ${p.callsign}</div>
             <div class="modal-details">
-                ${isAdmin ? `<div class="discord-box"><b>DISCORD NICK (Admin)</b><br>${p.discord}</div>` : ''}
-                <div class="detail-item"><b>EVOC</b>${isAdmin ? createCheckList('evoc', p.evoc) : formatTags(p.evoc)}</div>
-                <div class="detail-item"><b>ZBRANE</b>${isAdmin ? createCheckList('zbrane', p.zbrane) : formatTags(p.zbrane)}</div>
-                <div class="detail-item"><b>SEB</b>${isAdmin ? createCheckList('seb', p.seb) : formatTags(p.seb)}</div>
-                <div class="detail-item"><b>MEDICAL (POST)</b>${isAdmin ? createCheckList('medical', p.medical) : formatTags(p.medical)}</div>
-                <div class="detail-item"><b>ASD</b>${isAdmin ? createCheckList('asd', p.asd) : formatTags(p.asd)}</div>
+                <div class="detail-item"><b>EVOC:</b><br>${isAdmin ? createCheckList('evoc', p.evoc) : formatTags(p.evoc)}</div>
+                <div class="detail-item"><b>ZBRANE:</b><br>${isAdmin ? createCheckList('zbrane', p.zbrane) : formatTags(p.zbrane)}</div>
+                <div class="detail-item"><b>MEDICAL:</b><br>${isAdmin ? createCheckList('medical', p.medical) : formatTags(p.medical)}</div>
+                <div class="detail-item"><b>ASD:</b><br>${isAdmin ? createCheckList('asd', p.asd) : formatTags(p.asd)}</div>
+                <div class="detail-item"><b>SEB:</b><br>${isAdmin ? createCheckList('seb', p.seb) : formatTags(p.seb)}</div>
             </div>
-            ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.discord}')">AKTUALIZOVAŤ PODĽA DISCORDU</button>` : ''}
+            ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.discord}')">ULOŽIŤ ZMENY</button>` : ''}
         `;
         modal.style.display = 'flex';
     }
@@ -209,16 +199,12 @@
     async function updateExisting(discord) {
         const getCheck = (cat) => Array.from(document.querySelectorAll(`.check-${cat}:checked`)).map(c => c.value).join(', ') || "";
         const d = { 
-            action: "update", 
-            discord, 
-            evoc: getCheck('evoc'), 
-            zbrane: getCheck('zbrane'), 
-            seb: getCheck('seb'), 
-            medical: getCheck('medical'),
-            asd: getCheck('asd') 
+            action: "update", discord, 
+            evoc: getCheck('evoc'), zbrane: getCheck('zbrane'), 
+            seb: getCheck('seb'), medical: getCheck('medical'), asd: getCheck('asd') 
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil aktualizovaný!"); location.reload();
+        alert("Profil bol úspešne aktualizovaný!"); location.reload();
     }
 
     async function submitMember(action) {
@@ -232,15 +218,15 @@
             dob: document.getElementById('new-dob').value, 
             tel: document.getElementById('new-tel').value, 
             foto: document.getElementById('new-foto').value || DEFAULT_PHOTO,
-            // TU PRIDE ZÁPIS DO TABUĽKY - už žiadne N/A
+            // TU PRIDÁVAME AUTOMATICKÉ LICENCIE PRE NOVÝ PROFIL
             evoc: "Code 3, Pursuit",
+            zbrane: "Service Handgun, Less Lethal",
             medical: "POST First Aid/CPR/AED",
-            zbrane: "",
             seb: "",
             asd: ""
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Člen pridaný so základnými certifikátmi!"); location.reload();
+        alert("Člen pridaný so všetkými základnými licenciami!"); location.reload();
     }
 
     function filterCategory(cat, el) {
@@ -259,7 +245,7 @@
 
     function loginAdmin() {
         if(isAdmin) { location.reload(); return; }
-        if(prompt("Heslo:") === ADMIN_PASSWORD) { 
+        if(prompt("Admin heslo:") === ADMIN_PASSWORD) { 
             isAdmin = true; 
             document.getElementById('admin-banner').style.display = 'block'; 
             document.getElementById('admin-text').innerText = 'Odhlásiť';
