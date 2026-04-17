@@ -16,8 +16,8 @@
         .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
 
         #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
-        header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 25px; text-align: center; }
-        header h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+        header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 15px; text-align: center; }
+        header img { max-height: 120px; width: auto; }
 
         #admin-banner { display: none; background: var(--primary); color: black; padding: 10px; text-align: center; font-weight: bold; }
         .admin-btn { background: black; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
@@ -69,7 +69,9 @@
 </div>
 
 <div id="main-content">
-    <header><h1>Los Santos Sheriff Department</h1></header>
+    <header>
+        <img src="https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&" alt="LSSD Logo">
+    </header>
     <div id="admin-banner">ADMIN PANEL AKTÍVNY | <button class="admin-btn" onclick="toggleForm()">+ PRIDAŤ ČLENA</button></div>
     <div id="add-member-form">
         <div class="form-grid">
@@ -100,7 +102,8 @@
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
     const ADMIN_PASSWORD = "LSSD2026"; 
-    const DEFAULT_PHOTO = "https://i.imgur.com/8K9QYm7.png"; 
+    // Tvoja Discord fotka nastavená ako globálna stock photo
+    const STOCK_PHOTO = "https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&"; 
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
@@ -124,15 +127,20 @@
             const rows = csv.split('\n').slice(1);
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
+                
+                // Kontrola fotky: Ak je prázdna alebo neplatná, daj STOCK_PHOTO
+                let photoUrl = c[11];
+                if (!photoUrl || photoUrl.length < 10) { photoUrl = STOCK_PHOTO; }
+
                 return { 
                     meno: c[0], badge: c[1], hodnost: c[2], discord: c[3], callsign: c[4],
                     evoc: cleanVal(c[5]), zbrane: cleanVal(c[6]), seb: cleanVal(c[7]), 
                     medical: cleanVal(c[8]), asd: cleanVal(c[9]), dob: c[10], 
-                    foto: c[11] || DEFAULT_PHOTO, tel: c[12]
+                    foto: photoUrl, tel: c[12]
                 };
             }).filter(x => x.meno);
             renderRoster(currentData);
-        } catch (e) { console.error("Chyba:", e); }
+        } catch (e) { console.error("Chyba načítania:", e); }
     }
 
     function renderRoster(data) {
@@ -163,7 +171,7 @@
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
         const formatTags = (str) => {
-            if(!str || str === "") return `<span style="color:#555">Nula</span>`;
+            if(!str || str === "") return `<span style="color:#555">Žiadne certifikácie</span>`;
             return str.split(', ').map(v => `<span class="license-tag">${v}</span>`).join('');
         };
         const createCheckList = (cat, currentStr) => {
@@ -214,10 +222,10 @@
             callsign: document.getElementById('new-callsign').value,
             dob: document.getElementById('new-dob').value, 
             tel: document.getElementById('new-tel').value, 
-            foto: document.getElementById('new-foto').value || DEFAULT_PHOTO 
+            foto: document.getElementById('new-foto').value || STOCK_PHOTO 
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Člen pridaný!"); location.reload();
+        alert("Člen úspešne pridaný!"); location.reload();
     }
 
     function filterCategory(cat, el) {
@@ -234,7 +242,11 @@
 
     function loginAdmin() {
         if(isAdmin) { location.reload(); return; }
-        if(prompt("Admin heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Odhlásiť'; }
+        if(prompt("Admin heslo:") === ADMIN_PASSWORD) { 
+            isAdmin = true; 
+            document.getElementById('admin-banner').style.display = 'block'; 
+            document.getElementById('admin-text').innerText = 'Odhlásiť';
+        }
     }
 
     function toggleForm() { const f = document.getElementById('add-member-form'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
