@@ -34,7 +34,7 @@
         .profile-mini { display: flex; align-items: center; gap: 15px; }
         .mini-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; background: #333; }
 
-        .license-tag { background: rgba(197, 160, 89, 0.1); border: 1px solid var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.75em; display: inline-block; margin-left: 5px; color: var(--primary); text-transform: uppercase; font-weight: bold; }
+        .license-tag { background: rgba(197, 160, 89, 0.1); border: 1px solid var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.75em; display: inline-block; margin: 2px; color: var(--primary); text-transform: uppercase; font-weight: bold; }
         
         #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: #161616; width: 550px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; max-height: 90vh; overflow-y: auto; }
@@ -98,7 +98,7 @@
 
 <script>
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
+    const SCRIPT_URL = 'VLOZ_SEM_TVOJU_NOVU_URL_Z_APPS_SCRIPTU'; 
     const ADMIN_PASSWORD = "LSSD2026"; 
     const DEFAULT_PHOTO = "https://i.imgur.com/8K9QYm7.png"; 
 
@@ -132,7 +132,7 @@
                 };
             }).filter(x => x.meno);
             renderRoster(currentData);
-        } catch (e) { console.error("Chyba načítania:", e); }
+        } catch (e) { console.error("Chyba:", e); }
     }
 
     function renderRoster(data) {
@@ -143,24 +143,18 @@
             card.className = 'rank-card';
             card.onclick = () => openProfile(p);
             
-            let infoTags = "";
+            let tags = "";
             if (currentFilter !== 'all') {
                 const vals = p[currentFilter] ? p[currentFilter].split(', ') : [];
-                infoTags = vals.map(v => `<span class="license-tag">${v}</span>`).join('');
+                tags = vals.map(v => `<span class="license-tag">${v}</span>`).join('');
             }
 
             card.innerHTML = `
                 <div class="profile-mini">
                     <img src="${p.foto}" class="mini-photo">
-                    <div>
-                        <b>${p.meno}</b><br>
-                        <small>${p.hodnost} • #${p.badge} (${p.callsign})</small>
-                    </div>
+                    <div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    ${infoTags}
-                    <i class='bx bx-chevron-right' style="margin-left: 10px; color: var(--primary)"></i>
-                </div>
+                <div>${tags} <i class='bx bx-chevron-right' style="color:var(--primary)"></i></div>
             `;
             container.appendChild(card);
         });
@@ -168,6 +162,10 @@
 
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
+        const formatTags = (str) => {
+            if(!str || str === "") return `<span style="color:#555">Žiadne certifikácie</span>`;
+            return str.split(', ').map(v => `<span class="license-tag">${v}</span>`).join('');
+        };
         const createCheckList = (cat, currentStr) => {
             const currentArr = currentStr ? currentStr.split(', ') : [];
             return `<div class="admin-check-list">` + options[cat].map(opt => `
@@ -175,21 +173,16 @@
             `).join('') + `</div>`;
         };
 
-        const formatTags = (str) => {
-            if(!str || str === "") return `<span style="color:#555; font-size: 0.8em;">Žiadne certifikácie</span>`;
-            return str.split(', ').map(v => `<span class="license-tag">${v}</span>`).join('');
-        };
-
         document.getElementById('modal-data').innerHTML = `
             <img src="${p.foto}" class="modal-photo">
-            <h2 style="margin:10px 0 5px;">${p.meno}</h2>
+            <h2>${p.meno}</h2>
             <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} | ${p.callsign}</div>
             <div class="modal-details">
-                <div class="detail-item"><b>EVOC:</b><br>${isAdmin ? createCheckList('evoc', p.evoc) : formatTags(p.evoc)}</div>
-                <div class="detail-item"><b>ZBRANE:</b><br>${isAdmin ? createCheckList('zbrane', p.zbrane) : formatTags(p.zbrane)}</div>
-                <div class="detail-item"><b>MEDICAL:</b><br>${isAdmin ? createCheckList('medical', p.medical) : formatTags(p.medical)}</div>
-                <div class="detail-item"><b>ASD:</b><br>${isAdmin ? createCheckList('asd', p.asd) : formatTags(p.asd)}</div>
-                <div class="detail-item"><b>SEB:</b><br>${isAdmin ? createCheckList('seb', p.seb) : formatTags(p.seb)}</div>
+                <div><b>EVOC:</b><br>${isAdmin ? createCheckList('evoc', p.evoc) : formatTags(p.evoc)}</div>
+                <div><b>ZBRANE:</b><br>${isAdmin ? createCheckList('zbrane', p.zbrane) : formatTags(p.zbrane)}</div>
+                <div><b>MEDICAL:</b><br>${isAdmin ? createCheckList('medical', p.medical) : formatTags(p.medical)}</div>
+                <div><b>ASD:</b><br>${isAdmin ? createCheckList('asd', p.asd) : formatTags(p.asd)}</div>
+                <div><b>SEB:</b><br>${isAdmin ? createCheckList('seb', p.seb) : formatTags(p.seb)}</div>
             </div>
             ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.discord}')">ULOŽIŤ ZMENY</button>` : ''}
         `;
@@ -198,18 +191,14 @@
 
     async function updateExisting(discord) {
         const getCheck = (cat) => Array.from(document.querySelectorAll(`.check-${cat}:checked`)).map(c => c.value).join(', ') || "";
-        const d = { 
-            action: "update", discord, 
-            evoc: getCheck('evoc'), zbrane: getCheck('zbrane'), 
-            seb: getCheck('seb'), medical: getCheck('medical'), asd: getCheck('asd') 
-        };
+        const d = { action: "update", discord, evoc: getCheck('evoc'), zbrane: getCheck('zbrane'), seb: getCheck('seb'), medical: getCheck('medical'), asd: getCheck('asd') };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil bol úspešne aktualizovaný!"); location.reload();
+        alert("Zmeny uložené!"); location.reload();
     }
 
     async function submitMember(action) {
         const d = { 
-            action, 
+            action: action, 
             meno: document.getElementById('new-meno').value, 
             badge: document.getElementById('new-badge').value, 
             hodnost: document.getElementById('new-hodnost').value,
@@ -217,16 +206,10 @@
             callsign: document.getElementById('new-callsign').value,
             dob: document.getElementById('new-dob').value, 
             tel: document.getElementById('new-tel').value, 
-            foto: document.getElementById('new-foto').value || DEFAULT_PHOTO,
-            // TU PRIDÁVAME AUTOMATICKÉ LICENCIE PRE NOVÝ PROFIL
-            evoc: "Code 3, Pursuit",
-            zbrane: "Service Handgun, Less Lethal",
-            medical: "POST First Aid/CPR/AED",
-            seb: "",
-            asd: ""
+            foto: document.getElementById('new-foto').value || DEFAULT_PHOTO 
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Člen pridaný so všetkými základnými licenciami!"); location.reload();
+        alert("Profil vytvorený so základnými licenciami!"); location.reload();
     }
 
     function filterCategory(cat, el) {
@@ -238,18 +221,12 @@
 
     function handleSearch() {
         const val = document.getElementById('search-input').value.toLowerCase();
-        document.querySelectorAll('.rank-card').forEach(card => {
-            card.classList.toggle('hidden', !card.innerText.toLowerCase().includes(val));
-        });
+        document.querySelectorAll('.rank-card').forEach(card => card.classList.toggle('hidden', !card.innerText.toLowerCase().includes(val)));
     }
 
     function loginAdmin() {
         if(isAdmin) { location.reload(); return; }
-        if(prompt("Admin heslo:") === ADMIN_PASSWORD) { 
-            isAdmin = true; 
-            document.getElementById('admin-banner').style.display = 'block'; 
-            document.getElementById('admin-text').innerText = 'Odhlásiť';
-        }
+        if(prompt("Admin heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Odhlásiť'; }
     }
 
     function toggleForm() { const f = document.getElementById('add-member-form'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
