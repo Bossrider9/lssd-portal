@@ -1,230 +1,83 @@
-<!DOCTYPE html>
-<html lang="sk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSSD | Training Bureau Database</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <style>
-        :root { --primary: #c5a059; --bg-dark: #0a0a0a; --card-bg: #161616; --sidebar-width: 70px; --sidebar-expanded: 280px; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #e0e0e0; margin: 0; display: flex; overflow: hidden; }
-        #sidebar { width: var(--sidebar-width); height: 100vh; background: #0d140f; border-right: 1px solid #1b3022; position: fixed; transition: 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
-        #sidebar:hover { width: var(--sidebar-expanded); }
-        .nav-item { padding: 18px 23px; display: flex; align-items: center; cursor: pointer; color: #888; white-space: nowrap; }
-        .nav-item:hover, .nav-item.active { background: rgba(197, 160, 89, 0.1); color: var(--primary); }
-        .nav-icon { font-size: 24px; min-width: 25px; margin-right: 25px; }
-        #main-content { margin-left: var(--sidebar-width); flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
-        header { background: #0d140f; border-bottom: 2px solid var(--primary); padding: 25px; text-align: center; }
-        header h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
-        #admin-banner { display: none; background: var(--primary); color: black; padding: 10px; text-align: center; font-weight: bold; }
-        .admin-btn { background: black; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
-        #add-member-form { display: none; background: #1a1a1a; padding: 20px; border-bottom: 1px solid var(--primary); }
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 900px; margin: 0 auto; }
-        .form-grid input { background: #222; border: 1px solid #444; padding: 8px; color: white; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        .search-bar-wrapper { padding: 20px 40px; background: #111; position: sticky; top: 0; z-index: 100; }
-        #search-input { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 15px; color: white; border-radius: 8px; outline: none; }
-        .container { padding: 20px 40px; }
-        .rank-card { background: var(--card-bg); border: 1px solid #222; padding: 15px 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; cursor: pointer; }
-        .rank-card:hover { border-color: var(--primary); }
-        .profile-mini { display: flex; align-items: center; gap: 15px; }
-        .mini-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
-        .status-box { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 8px 15px; border-radius: 5px; text-align: center; min-width: 140px; }
-        .status-passed { color: #4CAF50; font-weight: bold; }
-        #profile-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #161616; width: 550px; border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; position: relative; padding-bottom: 20px; max-height: 90vh; overflow-y: auto; }
-        .modal-header { height: 80px; background: #1b3022; }
-        .modal-body { padding: 0 30px; text-align: center; margin-top: -50px; }
-        .modal-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; background: #222; }
-        .modal-details { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
-        .detail-item b { display: block; font-size: 0.75em; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
-        .license-list { display: flex; flex-wrap: wrap; gap: 5px; }
-        .license-tag { background: #222; border: 1px solid #444; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
-        .admin-check-list { text-align: left; background: #222; padding: 10px; border-radius: 5px; border: 1px solid #444; }
-        .admin-check-list label { display: block; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; color: #ccc; }
-        .update-btn { background: var(--primary); color: black; border: none; padding: 12px; width: 80%; margin: 20px auto; display: block; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #777; z-index: 10; }
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
+// Upravené načítanie dát (indexy stĺpcov podľa tvojej novej tabuľky)
+async function loadData() {
+    try {
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=0`);
+        const csv = await res.text();
+        const rows = csv.split('\n').slice(1);
+        currentData = rows.map(row => {
+            const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
+            return { 
+                meno: c[0], badge: c[1], hodnost: c[2], 
+                discord: c[3] || "N/A", 
+                callsign: c[4] || "N/A",
+                evoc: c[5], zbrane: c[6], seb: c[7], medical: c[8],
+                dob: c[9], foto: c[10], tel: c[11]
+            };
+        }).filter(x => x.meno);
+        renderRoster(currentData);
+    } catch (e) { console.error(e); }
+}
 
-<div id="sidebar">
-    <div style="padding: 20px; color: var(--primary); font-weight: bold;">LSSD TB</div>
-    <div class="nav-item active" onclick="filterCategory('all', this)"><i class='bx bx-grid-alt nav-icon'></i><span>Prehľad</span></div>
-    <div class="nav-item" onclick="filterCategory('evoc', this)"><i class='bx bx-car nav-icon'></i><span>EVOC</span></div>
-    <div class="nav-item" onclick="filterCategory('zbrane', this)"><i class='bx bx-target-lock nav-icon'></i><span>Zbrane</span></div>
-    <div class="nav-item" onclick="filterCategory('seb', this)"><i class='bx bx-shield nav-icon'></i><span>SEB</span></div>
-    <div class="nav-item" onclick="filterCategory('medical', this)"><i class='bx bx-plus-medical nav-icon'></i><span>Medical</span></div>
-    <div style="margin-top: auto; border-top: 1px solid #1b3022;"><div class="nav-item" onclick="loginAdmin()"><i class='bx bx-lock-alt nav-icon' id="admin-icon"></i><span id="admin-text">Admin Login</span></div></div>
-</div>
-
-<div id="main-content">
-    <header><h1>Los Santos Sheriff Department</h1></header>
-    <div id="admin-banner">ADMIN PANEL AKTÍVNY | <button class="admin-btn" onclick="toggleForm()">+ PRIDAŤ ČLENA</button></div>
-    <div id="add-member-form">
-        <div class="form-grid">
-            <input type="text" id="new-meno" placeholder="Meno">
-            <input type="text" id="new-badge" placeholder="Badge #">
-            <input type="text" id="new-hodnost" placeholder="Hodnosť">
-            <input type="text" id="new-dob" placeholder="DOB">
-            <input type="text" id="new-tel" placeholder="Telefón">
-            <input type="text" id="new-foto" placeholder="Link na foto">
-        </div>
-        <button onclick="submitMember('create')" style="display:block; margin: 10px auto; background: var(--primary); border:none; padding: 8px 20px; cursor:pointer; font-weight:bold;">ULOŽIŤ DO SYSTÉMU</button>
-    </div>
-    <div class="search-bar-wrapper"><input type="text" id="search-input" placeholder="Hľadať podľa mena, badge..." onkeyup="handleSearch()"></div>
-    <div class="container" id="roster-container">Prístup k dátam Training Bureau...</div>
-</div>
-
-<div id="profile-modal"><div class="modal-content"><span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span><div class="modal-header"></div><div class="modal-body" id="modal-data"></div></div></div>
-
-<script>
-    const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
-    const ADMIN_PASSWORD = "LSSDCBD2026";
-
-    let currentData = [], currentFilter = 'all', isAdmin = false;
-
-    const options = {
-        evoc: [
-            {val: "N/A", desc: "⚪ N/A (Standard Operator)"},
-            {val: "Code 3 Authorized", desc: "🚨 Code 3 Authorized (Majáky)"},
-            {val: "Pursuit Certified", desc: "🏎️ Pursuit Certified (PIT manéver)"},
-            {val: "Off-Road / Heavy Duty", desc: "🚜 Off-Road / Heavy Duty"},
-            {val: "HSU Certified", desc: "🏁 HSU Certified (High Speed Unit)"},
-            {val: "Motorcycle Certified", desc: "🏍️ Motorcycle Certified (Motor Unit)"}
-        ],
-        zbrane: [
-            {val: "N/A", desc: "⚪ N/A (Standard Duty Weapon)"},
-            {val: "Marksman / Sharpshooter", desc: "🎯 Marksman / Sharpshooter"},
-            {val: "Expert", desc: "🔥 Expert Qualified"},
-            {val: "Range Master / Instructor", desc: "🎓 Range Master / Instructor"},
-            {val: "Specialized Weapons", desc: "🔫 Specialized Weapons"}
-        ],
-        seb: [
-            {val: "N/A", desc: "⚪ N/A (Patrol Personnel)"},
-            {val: "SEB Operator", desc: "🛡️ SEB Operator"},
-            {val: "Reserve / Retired SEB", desc: "⏳ Reserve / Retired SEB"},
-            {val: "Specialist / Team Leader", desc: "⭐ Specialist / Team Leader"},
-            {val: "ESD (Emergency Services Detail)", desc: "🚁 ESD (Tactical Medics)"}
-        ],
-        medical: [
-            {val: "N/A", desc: "⚪ N/A (Basic First Aid / CPR)"},
-            {val: "First Responder", desc: "🩹 First Responder"},
-            {val: "EMT-B Certified", desc: "🚑 EMT-B Certified"},
-            {val: "Tactical Medic (ESD)", desc: "⛑️ Tactical Medic (ESD)"},
-            {val: "Air Support Pilot", desc: "🚁 ASD Pilot (Helikoptéry)"},
-            {val: "Tactical Flight Officer", desc: "📷 TFO (Pozorovateľ)"}
-        ]
-    };
-
-    async function loadData() {
-        try {
-            const res = await fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&gid=0`);
-            const csv = await res.text();
-            const rows = csv.split('\n').slice(1);
-            currentData = rows.map(row => {
-                const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
-                return { 
-                    meno: c[0] || "Neznáme meno", 
-                    badge: c[1] || "---", 
-                    hodnost: c[2] || "Officer", 
-                    evoc: c[3] || "N/A", 
-                    zbrane: c[4] || "N/A", 
-                    seb: c[5] || "N/A", 
-                    medical: c[6] || "N/A", 
-                    dob: c[7] || "N/A", 
-                    foto: c[8] || "https://i.imgur.com/8K9mS7E.png", 
-                    tel: c[9] || "N/A" 
-                };
-            }).filter(x => x.meno && x.meno !== "Neznáme meno");
-            renderRoster(currentData);
-        } catch (e) { console.error(e); }
-    }
-
-    function renderRoster(data) {
-        const container = document.getElementById('roster-container');
-        container.innerHTML = "";
-        data.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'rank-card';
-            card.onclick = () => openProfile(p);
-            card.setAttribute('data-search', `${p.meno} ${p.badge}`.toLowerCase());
-            let right = currentFilter === 'all' ? `<div style="color:var(--primary)">VIEW PROFILE ></div>` : `<div class="status-box"><span style="display:block; font-size:0.6em; color:#777;">${currentFilter.toUpperCase()}</span><span class="${(p[currentFilter]||'N/A')!=='N/A'?'status-passed':''}">${p[currentFilter]||'N/A'}</span></div>`;
-            card.innerHTML = `<div class="profile-mini"><img src="${p.foto}" class="mini-photo"><div><b>${p.meno}</b><br><small>${p.hodnost} • #${p.badge}</small></div></div>${right}`;
-            container.appendChild(card);
-        });
-    }
-
-    function openProfile(p) {
-        const modal = document.getElementById('profile-modal');
-        const createAdminSection = (cat, currentStr) => {
-            const currentArr = currentStr ? currentStr.split(', ') : ["N/A"];
-            let html = `<div class="admin-check-list">`;
-            options[cat].forEach(opt => {
-                const checked = currentArr.includes(opt.val) ? 'checked' : '';
-                html += `<label><input type="checkbox" class="check-${cat}" value="${opt.val}" ${checked}> ${opt.desc}</label>`;
-            });
-            return html + `</div>`;
-        };
-        const createPublicSection = (currentStr) => {
-            const arr = currentStr ? currentStr.split(', ') : ["N/A"];
-            return `<div class="license-list">${arr.map(l => `<span class="license-tag">${l}</span>`).join('')}</div>`;
-        };
-        document.getElementById('modal-data').innerHTML = `
-            <img src="${p.foto}" class="modal-photo">
-            <h2 style="margin:10px 0 5px;">${p.meno}</h2>
-            <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} #${p.badge}</div>
-            <div class="modal-details">
-                <div class="detail-item"><b>EVOC & Specialized Driving</b>${isAdmin ? createAdminSection('evoc', p.evoc) : createPublicSection(p.evoc)}</div>
-                <div class="detail-item"><b>Zbraňové kvalifikácie</b>${isAdmin ? createAdminSection('zbrane', p.zbrane) : createPublicSection(p.zbrane)}</div>
-                <div class="detail-item"><b>SEB Divízia</b>${isAdmin ? createAdminSection('seb', p.seb) : createPublicSection(p.seb)}</div>
-                <div class="detail-item"><b>Medical & ASD Support</b>${isAdmin ? createAdminSection('medical', p.medical) : createPublicSection(p.medical)}</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                    <div class="detail-item"><b>DOB</b><span>${p.dob}</span></div>
-                    <div class="detail-item"><b>Telefón</b><span>${p.tel}</span></div>
+// Zobrazenie v zozname (pridaný Callsign k hodnosti)
+function renderRoster(data) {
+    const container = document.getElementById('roster-container');
+    container.innerHTML = "";
+    data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'rank-card';
+        card.onclick = () => openProfile(p);
+        card.innerHTML = `
+            <div class="profile-mini">
+                <img src="${p.foto}" class="mini-photo">
+                <div>
+                    <b>${p.meno}</b><br>
+                    <small>${p.hodnost} • #${p.badge} (${p.callsign})</small>
                 </div>
             </div>
-            ${isAdmin ? `<button class="update-btn" onclick="updateExisting('${p.badge}')">AKTUALIZOVAŤ PROFIL</button>` : ''}
-        `;
-        modal.style.display = 'flex';
-    }
+            <div style="color:var(--primary)">PROFIL ></div>`;
+        container.appendChild(card);
+    });
+}
 
-    function getSelected(cat) {
-        const checks = document.querySelectorAll(`.check-${cat}:checked`);
-        const vals = Array.from(checks).map(c => c.value);
-        return vals.length > 0 ? vals.join(', ') : "N/A";
-    }
+// Zobrazenie detailu (Discord Nick vidí iba Admin)
+function openProfile(p) {
+    const modal = document.getElementById('profile-modal');
+    document.getElementById('modal-data').innerHTML = `
+        <img src="${p.foto}" class="modal-photo">
+        <h2 style="margin:10px 0 5px;">${p.meno}</h2>
+        <div style="color:var(--primary); font-weight:bold; margin-bottom:15px;">${p.hodnost} | ${p.callsign}</div>
+        
+        <div class="modal-details">
+            ${isAdmin ? `<div class="detail-item" style="background:rgba(197,160,89,0.1); padding:10px; border-radius:5px;">
+                <b>DISCORD NICK (ADMIN ONLY)</b><span>${p.discord}</span>
+            </div>` : ''}
+            
+            <div class="detail-item"><b>EVOC</b><span>${p.evoc}</span></div>
+            <div class="detail-item"><b>Zbrane</b><span>${p.zbrane}</span></div>
+            <div class="detail-item"><b>SEB</b><span>${p.seb}</span></div>
+            <div class="detail-item"><b>Medical/ASD</b><span>${p.medical}</span></div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="detail-item"><b>DOB</b><span>${p.dob}</span></div>
+                <div class="detail-item"><b>Badge</b><span>#${p.badge}</span></div>
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
 
-    async function updateExisting(badge) {
-        const d = { action: "update", badge, evoc: getSelected('evoc'), zbrane: getSelected('zbrane'), seb: getSelected('seb'), medical: getSelected('medical') };
-        const btn = event.target; btn.innerText = "UKLADÁM..."; btn.disabled = true;
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil bol úspešne aktualizovaný!"); location.reload();
-    }
-
-    async function submitMember(action) {
-        const d = { action, meno: document.getElementById('new-meno').value, badge: document.getElementById('new-badge').value, hodnost: document.getElementById('new-hodnost').value, dob: document.getElementById('new-dob').value, tel: document.getElementById('new-tel').value, foto: document.getElementById('new-foto').value };
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Nový člen pridaný!"); location.reload();
-    }
-
-    function loginAdmin() {
-        if(isAdmin) { location.reload(); return; }
-        if(prompt("Heslo:") === ADMIN_PASSWORD) { isAdmin = true; document.getElementById('admin-banner').style.display = 'block'; document.getElementById('admin-text').innerText = 'Logout Admin'; }
-    }
-
-    function filterCategory(cat, el) {
-        currentFilter = cat;
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        renderRoster(currentData);
-    }
-
-    function toggleForm() { const f = document.getElementById('add-member-form'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
-    function handleSearch() { const q = document.getElementById('search-input').value.toLowerCase(); Array.from(document.getElementsByClassName('rank-card')).forEach(c => c.classList.toggle('hidden', !c.getAttribute('data-search').includes(q))); }
-
-    loadData();
-</script>
-</body>
-</html>
+// Pridanie člena (doplnené o nové polia)
+async function submitMember(action) {
+    const d = { 
+        action, 
+        meno: document.getElementById('new-meno').value, 
+        badge: document.getElementById('new-badge').value, 
+        hodnost: document.getElementById('new-hodnost').value,
+        discord: document.getElementById('new-discord').value,
+        callsign: document.getElementById('new-callsign').value,
+        dob: document.getElementById('new-dob').value, 
+        tel: document.getElementById('new-tel').value, 
+        foto: document.getElementById('new-foto').value 
+    };
+    // ... zvyšok fetch funkcie ...
+}
