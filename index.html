@@ -98,7 +98,7 @@
 
 <script>
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
-    const SCRIPT_URL = 'VLOZ_SEM_TVOJU_NOVU_URL_Z_APPS_SCRIPTU'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
     const ADMIN_PASSWORD = "LSSD2026"; 
     const DEFAULT_PHOTO = "https://i.imgur.com/8K9QYm7.png"; 
 
@@ -163,7 +163,7 @@
     function openProfile(p) {
         const modal = document.getElementById('profile-modal');
         const formatTags = (str) => {
-            if(!str || str === "") return `<span style="color:#555">Žiadne certifikácie</span>`;
+            if(!str || str === "") return `<span style="color:#555">Nula</span>`;
             return str.split(', ').map(v => `<span class="license-tag">${v}</span>`).join('');
         };
         const createCheckList = (cat, currentStr) => {
@@ -191,7 +191,15 @@
 
     async function updateExisting(discord) {
         const getCheck = (cat) => Array.from(document.querySelectorAll(`.check-${cat}:checked`)).map(c => c.value).join(', ') || "";
-        const d = { action: "update", discord, evoc: getCheck('evoc'), zbrane: getCheck('zbrane'), seb: getCheck('seb'), medical: getCheck('medical'), asd: getCheck('asd') };
+        const d = { 
+            action: "update", 
+            discord: discord, 
+            evoc: getCheck('evoc'), 
+            zbrane: getCheck('zbrane'), 
+            seb: getCheck('seb'), 
+            medical: getCheck('medical'), 
+            asd: getCheck('asd') 
+        };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
         alert("Zmeny uložené!"); location.reload();
     }
@@ -209,7 +217,7 @@
             foto: document.getElementById('new-foto').value || DEFAULT_PHOTO 
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        alert("Profil vytvorený so základnými licenciami!"); location.reload();
+        alert("Člen pridaný!"); location.reload();
     }
 
     function filterCategory(cat, el) {
