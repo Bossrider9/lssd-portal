@@ -106,16 +106,16 @@
 <script>
     const SPREADSHEET_ID = '1XV1W7389XpImrUCSHJCgICwEAyQxrzpnP41FQcyKw1w';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPucjt4yN-fu-Je_FSKKvI5MOVb9h5zf03xr0CUCsIHmMP5_kmXWubCHIwdIoQq8KP/exec';
-    const ADMIN_PASSWORD = "LSSDCBD2026"; 
+    const ADMIN_PASSWORD = "LSSD2026"; 
     const STOCK_PHOTO = "https://cdn.discordapp.com/attachments/761596487897186330/1494695432448901352/lssd.png?ex=69e38b19&is=69e23999&hm=42d72064014d8279417c43a96e719567e7f9f15781118bf0fc77b5a7b2ef7c72&"; 
 
     let currentData = [], currentFilter = 'all', isAdmin = false;
 
     const options = {
-        evoc: ["Code 3", "Pursuit", "Off-Road", "HSU", "MBU"],
+        evoc: ["Code 3", "Pursuit", "Off-Road", "HSU", "Motor"],
         zbrane: ["Service Handgun", "Less Lethal", "Long Rifle", "Shotgun", "Precision Rifle", "Instructor"],
-        seb: ["Operator", "Specialist", "TL", "CLS"],
-        medical: ["POST First Aid/CPR/AED", "NARCAN Administration", "Tactical Medical (TCCC)"],
+        seb: ["Operator", "Specialist", "ESD"],
+        medical: ["POST First Aid/CPR/AED", "NARCAN Admin", "Tactical Medical (TCCC)"],
         asd: ["Pilot", "TFO"]
     };
 
@@ -133,8 +133,13 @@
             const rows = csv.split('\n').slice(1);
             currentData = rows.map(row => {
                 const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g, '').trim());
+                
+                // OPRAVENÁ LOGIKA FOTKY:
                 let photoUrl = c[11];
-                if (!photoUrl || photoUrl.length < 10 || photoUrl.toLowerCase() === "n/a") { photoUrl = STOCK_PHOTO; }
+                // Ak je políčko prázdne alebo obsahuje len "N/A", použi logo. Inak použi to, čo je v tabuľke (aj link z Discordu).
+                if (!photoUrl || photoUrl.trim() === "" || photoUrl.toUpperCase() === "N/A") {
+                    photoUrl = STOCK_PHOTO;
+                }
 
                 return { 
                     meno: c[0], badge: c[1], hodnost: c[2], discord: c[3], callsign: c[4],
@@ -162,7 +167,6 @@
                 tags = vals.map(v => `<span class="license-tag">${v}</span>`).join('');
             }
 
-            // TU JE ZMENA: Pridaný callsign vedľa hodnosti a badge
             card.innerHTML = `
                 <div class="profile-mini">
                     <img src="${p.foto}" class="mini-photo">
